@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
+import List.Extra as LExt
 
 
 main : Program Never Model Msg
@@ -60,11 +61,22 @@ type Msg
 
 initModel : Model
 initModel =
-    [ Card Ace Spades
-    , Card Queen Hearts
-    , Card Nine Clubs
-    , Card Three Diamonds
-    ]
+    LExt.lift2 (flip Card)
+        [ Hearts, Clubs, Diamonds, Spades ]
+        [ Ace
+        , Two
+        , Three
+        , Four
+        , Five
+        , Six
+        , Seven
+        , Eight
+        , Nine
+        , Ten
+        , Jack
+        , Queen
+        , King
+        ]
 
 
 
