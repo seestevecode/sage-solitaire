@@ -139,6 +139,9 @@ rankToHtml rank =
                 Nine ->
                     "9"
 
+                Ten ->
+                    "10"
+
                 _ ->
                     String.left 1 <| toString rank
     in
