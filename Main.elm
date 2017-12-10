@@ -25,7 +25,12 @@ init =
 
 
 type alias Model =
-    List Stack
+    { board : List Stack
+    , bonus : Card
+    , score : Int
+    , trashes : Int
+    , selected : List Card
+    }
 
 
 type alias Stack =
@@ -59,15 +64,28 @@ type Suit
     | Spades
 
 
+dummy : Card
+dummy =
+    Card Ace Spades
+
+
 type Msg
     = NoOp
 
 
 initModel : Model
 initModel =
-    LExt.groupsOfVarying
-        [ 8, 8, 8, 7, 6, 5, 4, 3, 2, 1 ]
-        standardDeck
+    { board =
+        LExt.init standardDeck
+            |> Maybe.withDefault (List.repeat 51 dummy)
+            |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
+    , bonus =
+        LExt.last standardDeck
+            |> Maybe.withDefault dummy
+    , score = 0
+    , trashes = 2
+    , selected = []
+    }
 
 
 standardDeck : List Card
@@ -106,7 +124,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div [] <| List.map renderStack model
+        [ Html.div [] <| List.map renderStack model.board
+        , Html.hr [] []
+        , Html.div [] [ renderCard model.bonus ]
+        , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
+        , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
         , Html.hr [] []
         , Html.div [] [ Html.text <| toString model ]
         ]
@@ -123,13 +145,12 @@ renderStack cards =
             , ( "width", "70px" )
             , ( "height", "70px" )
             , ( "margin", "0 auto" )
-            , ( "position", "relative" )
             , ( "background-color", "#0c0" )
             ]
         ]
         [ cards
             |> List.head
-            |> Maybe.withDefault (Card Ace Spades)
+            |> Maybe.withDefault dummy
             |> renderCard
         , Html.div
             [ class "stack-size"
