@@ -24,7 +24,7 @@ init =
 
 
 type alias Model =
-    Card
+    List Card
 
 
 type alias Card =
@@ -60,7 +60,11 @@ type Msg
 
 initModel : Model
 initModel =
-    Card Ace Spades
+    [ Card Ace Spades
+    , Card Queen Hearts
+    , Card Nine Clubs
+    , Card Three Diamonds
+    ]
 
 
 
@@ -79,7 +83,8 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ renderCard model
+        [ Html.div [ class "card-list" ] <|
+            List.map renderCard model
         , Html.br [] []
         , Html.text <| toString model
         ]
