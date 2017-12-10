@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html)
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class, classList, style)
 import List.Extra as LExt
 
 
@@ -25,7 +25,11 @@ init =
 
 
 type alias Model =
-    List (List Card)
+    List Stack
+
+
+type alias Stack =
+    List Card
 
 
 type alias Card =
@@ -102,21 +106,34 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div [ class "card-lists" ] <|
-            List.map renderList model
-        , Html.br [] []
-        , Html.text <| toString model
+        [ Html.div [] <| List.map renderStack model
+        , Html.hr [] []
+        , Html.div [] [ Html.text <| toString model ]
         ]
 
 
-renderList : List Card -> Html Msg
-renderList cards =
-    Html.div [ class "card-list" ]
+renderStack : Stack -> Html Msg
+renderStack cards =
+    Html.div
+        [ class "stack"
+        , style
+            [ ( "padding", "10px" )
+            , ( "border", "1px solid #060" )
+            , ( "display", "table-cell" )
+            , ( "width", "70px" )
+            , ( "height", "70px" )
+            , ( "margin", "0 auto" )
+            , ( "position", "relative" )
+            , ( "background-color", "#0c0" )
+            ]
+        ]
         [ cards
             |> List.head
             |> Maybe.withDefault (Card Ace Spades)
             |> renderCard
-        , Html.span [ class "pile-size" ]
+        , Html.div
+            [ class "stack-size"
+            ]
             [ "("
                 ++ toString (List.length cards)
                 ++ ")"
@@ -127,7 +144,18 @@ renderList cards =
 
 renderCard : Card -> Html Msg
 renderCard { rank, suit } =
-    Html.div [ class "card" ]
+    Html.div
+        [ class "card"
+        , style
+            [ ( "width", "30px" )
+            , ( "height", "40px" )
+            , ( "border-radius", "4px" )
+            , ( "margin", "5px" )
+            , ( "border", "1px solid grey" )
+            , ( "background-color", "white" )
+            , ( "font-size", "18px" )
+            ]
+        ]
         [ rankToHtml rank
         , suitToHtml suit
         ]
