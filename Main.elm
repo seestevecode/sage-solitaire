@@ -25,7 +25,7 @@ init =
 
 
 type alias Model =
-    List Card
+    List (List Card)
 
 
 type alias Card =
@@ -61,6 +61,13 @@ type Msg
 
 initModel : Model
 initModel =
+    LExt.groupsOfVarying
+        [ 8, 8, 8, 7, 6, 5, 4, 3, 2, 1 ]
+        standardDeck
+
+
+standardDeck : List Card
+standardDeck =
     LExt.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
         [ Ace
@@ -95,10 +102,26 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div [ class "card-list" ] <|
-            List.map renderCard model
+        [ Html.div [ class "card-lists" ] <|
+            List.map renderList model
         , Html.br [] []
         , Html.text <| toString model
+        ]
+
+
+renderList : List Card -> Html Msg
+renderList cards =
+    Html.div [ class "card-list" ]
+        [ cards
+            |> List.head
+            |> Maybe.withDefault (Card Ace Spades)
+            |> renderCard
+        , Html.span [ class "pile-size" ]
+            [ "("
+                ++ toString (List.length cards)
+                ++ ")"
+                |> Html.text
+            ]
         ]
 
 
