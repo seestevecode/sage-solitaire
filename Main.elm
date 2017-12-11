@@ -5,6 +5,8 @@ import Html.Attributes exposing (class, classList, style)
 import List.Extra as LExt
 import Matrix exposing (Matrix)
 import Array exposing (toList)
+import Random exposing (Generator)
+import Random.List
 
 
 main : Program Never Model Msg
@@ -23,11 +25,11 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initModel, Cmd.none )
+    ( initModel, Random.generate OnShuffle shuffledCardsGenerator )
 
 
 type alias Model =
-    { board : Matrix Stack -- TODO: make this a Matrix
+    { board : Matrix Stack
     , bonus : Suit
     , score : Int
     , trashes : Int
@@ -82,26 +84,34 @@ dummyMatrix =
 
 
 type Msg
-    = NoOp
+    = OnShuffle (List Card)
 
 
 initModel : Model
 initModel =
-    { board =
-        LExt.init standardDeck
-            |> Maybe.withDefault (List.repeat 51 dummyCard)
-            |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
-            |> LExt.groupsOf 3
-            |> Matrix.fromList
-            |> Maybe.withDefault dummyMatrix
-    , bonus =
-        LExt.last standardDeck
-            |> Maybe.withDefault dummyCard
-            |> .suit
+    { board = boardFromDeck standardDeck
+    , bonus = bonusFromDeck standardDeck
     , score = 0
     , trashes = 2
     , selected = []
     }
+
+
+boardFromDeck : List Card -> Matrix Stack
+boardFromDeck deck =
+    LExt.init deck
+        |> Maybe.withDefault (List.repeat 51 dummyCard)
+        |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
+        |> LExt.groupsOf 3
+        |> Matrix.fromList
+        |> Maybe.withDefault dummyMatrix
+
+
+bonusFromDeck : List Card -> Suit
+bonusFromDeck deck =
+    LExt.last deck
+        |> Maybe.withDefault dummyCard
+        |> .suit
 
 
 standardDeck : List Card
@@ -130,7 +140,19 @@ standardDeck =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        OnShuffle cards ->
+            ( { model
+                | board = boardFromDeck cards
+                , bonus = bonusFromDeck cards
+              }
+            , Cmd.none
+            )
+
+
+shuffledCardsGenerator : Generator (List Card)
+shuffledCardsGenerator =
+    Random.List.shuffle standardDeck
 
 
 
@@ -142,6 +164,8 @@ view model =
     Html.div []
         [ Html.div [] [ renderBoard model.board ]
         , Html.hr [] []
+
+        -- , Html.button [ onClick Shuffle ] [ Html.text "Shuffle" ]
         , Html.div [] [ Html.text <| toString model.bonus ]
         , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
         , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
@@ -185,10 +209,14 @@ renderStack cards =
             |> renderCard
         , Html.div
             [ class "stack-size"
+            , style
+                [ ( "font-variant", "small-caps" )
+                , ( "font-size", "0.8em" )
+                , ( "margin-top", "0.5em" )
+                ]
             ]
-            [ "("
+            [ "Cards: "
                 ++ toString (List.length cards)
-                ++ ")"
                 |> Html.text
             ]
         ]
