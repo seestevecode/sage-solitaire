@@ -3,6 +3,8 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList, style)
 import List.Extra as LExt
+import Matrix exposing (Matrix)
+import Array exposing (toList)
 
 
 main : Program Never Model Msg
@@ -25,7 +27,7 @@ init =
 
 
 type alias Model =
-    { board : List Stack
+    { board : Matrix Stack -- TODO: make this a Matrix
     , bonus : Card
     , score : Int
     , trashes : Int
@@ -64,9 +66,19 @@ type Suit
     | Spades
 
 
-dummy : Card
-dummy =
+dummyCard : Card
+dummyCard =
     Card Ace Spades
+
+
+dummyRow : List Stack
+dummyRow =
+    [ [ dummyCard ] ]
+
+
+dummyMatrix : Matrix Stack
+dummyMatrix =
+    Matrix.repeat 3 3 [ dummyCard ]
 
 
 type Msg
@@ -77,11 +89,14 @@ initModel : Model
 initModel =
     { board =
         LExt.init standardDeck
-            |> Maybe.withDefault (List.repeat 51 dummy)
+            |> Maybe.withDefault (List.repeat 51 dummyCard)
             |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
+            |> LExt.groupsOf 3
+            |> Matrix.fromList
+            |> Maybe.withDefault dummyMatrix
     , bonus =
         LExt.last standardDeck
-            |> Maybe.withDefault dummy
+            |> Maybe.withDefault dummyCard
     , score = 0
     , trashes = 2
     , selected = []
@@ -124,7 +139,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
-        [ Html.div [] <| List.map renderStack model.board
+        [ Html.div [] [ renderBoard model.board ]
         , Html.hr [] []
         , Html.div [] [ renderCard model.bonus ]
         , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
@@ -132,6 +147,22 @@ view model =
         , Html.hr [] []
         , Html.div [] [ Html.text <| toString model ]
         ]
+
+
+renderBoard : Matrix Stack -> Html Msg
+renderBoard board =
+    let
+        renderRow : Int -> Html Msg
+        renderRow y =
+            Matrix.getRow y board
+                |> Maybe.map (Array.toList)
+                |> Maybe.withDefault dummyRow
+                |> List.map renderStack
+                |> Html.div []
+    in
+        List.range 0 (Tuple.first board.size - 1)
+            |> List.map renderRow
+            |> Html.div []
 
 
 renderStack : Stack -> Html Msg
@@ -142,15 +173,14 @@ renderStack cards =
             [ ( "padding", "10px" )
             , ( "border", "1px solid #060" )
             , ( "display", "table-cell" )
-            , ( "width", "70px" )
-            , ( "height", "70px" )
-            , ( "margin", "0 auto" )
+            , ( "width", "120px" )
+            , ( "height", "120px" )
             , ( "background-color", "#0c0" )
             ]
         ]
         [ cards
             |> List.head
-            |> Maybe.withDefault dummy
+            |> Maybe.withDefault dummyCard
             |> renderCard
         , Html.div
             [ class "stack-size"
@@ -168,13 +198,12 @@ renderCard { rank, suit } =
     Html.div
         [ class "card"
         , style
-            [ ( "width", "30px" )
-            , ( "height", "40px" )
-            , ( "border-radius", "4px" )
-            , ( "margin", "5px" )
-            , ( "border", "1px solid grey" )
+            [ ( "width", "45px" )
+            , ( "height", "70px" )
+            , ( "border-radius", "5px" )
+            , ( "border", "1px solid #666" )
             , ( "background-color", "white" )
-            , ( "font-size", "18px" )
+            , ( "padding", "5px" )
             ]
         ]
         [ rankToHtml rank
@@ -217,10 +246,14 @@ rankToHtml rank =
                 _ ->
                     String.left 1 <| toString rank
     in
-        Html.span
+        Html.div
             [ classList
                 [ ( "rank", True )
                 , ( String.toLower <| toString rank, True )
+                ]
+            , style
+                [ ( "font", "15px Arial, sans-serif" )
+                , ( "font-weight", "bold" )
                 ]
             ]
             [ Html.text r ]
@@ -229,24 +262,28 @@ rankToHtml rank =
 suitToHtml : Suit -> Html Msg
 suitToHtml suit =
     let
-        s =
+        ( s, clr ) =
             case suit of
                 Hearts ->
-                    "♥"
+                    ( "♥", "red" )
 
                 Clubs ->
-                    "♣"
+                    ( "♣", "black" )
 
                 Diamonds ->
-                    "♦"
+                    ( "♦", "red" )
 
                 Spades ->
-                    "♠"
+                    ( "♠", "black" )
     in
-        Html.span
+        Html.div
             [ classList
                 [ ( "suit", True )
                 , ( String.toLower <| toString suit, True )
+                ]
+            , style
+                [ ( "color", clr )
+                , ( "font-size", "66px" )
                 ]
             ]
             [ Html.text s ]

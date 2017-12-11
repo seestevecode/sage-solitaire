@@ -13,5 +13,5 @@
 - [x] Render list of lists, showing head and length
 - [x] Render HTML
 - [x] Extend model
-- [ ] Render full board
+- [x] Render full board
 - [ ] Render list of lists as matrix
