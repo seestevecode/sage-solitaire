@@ -28,7 +28,7 @@ init =
 
 type alias Model =
     { board : Matrix Stack -- TODO: make this a Matrix
-    , bonus : Card
+    , bonus : Suit
     , score : Int
     , trashes : Int
     , selected : List Card
@@ -97,6 +97,7 @@ initModel =
     , bonus =
         LExt.last standardDeck
             |> Maybe.withDefault dummyCard
+            |> .suit
     , score = 0
     , trashes = 2
     , selected = []
@@ -141,7 +142,7 @@ view model =
     Html.div []
         [ Html.div [] [ renderBoard model.board ]
         , Html.hr [] []
-        , Html.div [] [ renderCard model.bonus ]
+        , Html.div [] [ Html.text <| toString model.bonus ]
         , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
         , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
         , Html.hr [] []

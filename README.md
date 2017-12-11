@@ -14,4 +14,5 @@
 - [x] Render HTML
 - [x] Extend model
 - [x] Render full board
-- [ ] Render list of lists as matrix
+- [ ] Generate shuffled deck
+- [ ] Separate CSS from Elm
