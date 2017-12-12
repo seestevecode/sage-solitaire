@@ -16,4 +16,6 @@
 - [x] Render full board
 - [x] Generate shuffled deck
 - [x] Highlight bonus cards
+- [x] Redo CSS
+- [ ] Add cards to selected
 - [ ] Separate CSS from Elm

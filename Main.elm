@@ -30,7 +30,7 @@ init =
 
 type alias Model =
     { board : Matrix Stack
-    , bonus : Suit
+    , bonus : Card
     , score : Int
     , trashes : Int
     , selected : List Card
@@ -107,11 +107,10 @@ boardFromDeck deck =
         |> Maybe.withDefault dummyMatrix
 
 
-bonusFromDeck : List Card -> Suit
+bonusFromDeck : List Card -> Card
 bonusFromDeck deck =
     LExt.last deck
         |> Maybe.withDefault dummyCard
-        |> .suit
 
 
 standardDeck : List Card
@@ -163,7 +162,7 @@ view : Model -> Html Msg
 view model =
     let
         cardView =
-            renderCard model.bonus
+            renderCard model.bonus.suit
 
         stackView =
             renderStack cardView
@@ -171,7 +170,7 @@ view model =
         Html.div []
             [ Html.div [] [ renderBoard stackView model.board ]
             , Html.hr [] []
-            , Html.div [] [ Html.text <| toString model.bonus ]
+            , Html.div [] [ Html.text <| "Bonus: " ++ toString model.bonus ]
             , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
@@ -200,30 +199,29 @@ renderStack cardView cards =
     Html.div
         [ class "stack"
         , style
-            [ ( "padding", "10px" )
-            , ( "border", "1px solid #060" )
-            , ( "display", "table-cell" )
-            , ( "width", "120px" )
-            , ( "height", "120px" )
-            , ( "background-color", "#0c0" )
+            [ ( "display", "table-cell" )
+            , ( "width", "100px" )
+            , ( "height", "100px" )
+            , ( "border", "1px solid #0c4" )
+            , ( "background-color", "#093" )
+            , ( "padding", "15px 25px" )
             ]
         ]
         [ cards
             |> List.head
             |> Maybe.withDefault dummyCard
             |> cardView
-        , Html.div
-            [ class "stack-size"
-            , style
-                [ ( "font-variant", "small-caps" )
-                , ( "font-size", "0.8em" )
-                , ( "margin-top", "0.5em" )
+        , Html.text "🂠"
+            |> List.repeat (List.length cards)
+            |> Html.div
+                [ class "stack-size"
+                , style
+                    [ ( "margin", "auto" )
+                    , ( "padding-top", "10px" )
+                    , ( "color", "white" )
+                    , ( "text-align", "center" )
+                    ]
                 ]
-            ]
-            [ "Cards: "
-                ++ toString (List.length cards)
-                |> Html.text
-            ]
         ]
 
 
@@ -232,12 +230,12 @@ renderCard bonus { rank, suit } =
     Html.div
         [ class "card"
         , style
-            [ ( "width", "45px" )
+            [ ( "width", "50px" )
             , ( "height", "70px" )
-            , ( "border-radius", "5px" )
-            , ( "border", "1px solid #666" )
             , ( "background-color", "white" )
-            , ( "padding", "5px" )
+            , ( "margin", "auto" )
+            , ( "border-radius", "5px" )
+            , ( "position", "relative" )
             ]
         ]
         [ rankToHtml rank
@@ -287,8 +285,11 @@ rankToHtml rank =
                 , ( String.toLower <| toString rank, True )
                 ]
             , style
-                [ ( "font", "15px Arial, sans-serif" )
+                [ ( "font", "35px Arial,sans-serif" )
                 , ( "font-weight", "bold" )
+                , ( "position", "absolute" )
+                , ( "bottom", "0" )
+                , ( "right", "5px" )
                 ]
             ]
             [ Html.text r ]
@@ -318,7 +319,10 @@ suitToHtml suit =
                 ]
             , style
                 [ ( "color", clr )
-                , ( "font-size", "66px" )
+                , ( "position", "absolute" )
+                , ( "top", "0" )
+                , ( "left", "5px" )
+                , ( "font-size", "30px" )
                 ]
             ]
             [ Html.text s ]
@@ -332,7 +336,11 @@ bonusStar bonusSuit cardSuit =
                 Html.span
                     [ class "star"
                     , style
-                        [ ( "color", "orange" ) ]
+                        [ ( "position", "absolute" )
+                        , ( "top", "2px" )
+                        , ( "right", "5px" )
+                        , ( "color", "orange" )
+                        ]
                     ]
                     [ Html.text "★" ]
             else
