@@ -15,5 +15,5 @@
 - [x] Extend model
 - [x] Render full board
 - [x] Generate shuffled deck
-- [ ] Highlight bonus cards
+- [x] Highlight bonus cards
 - [ ] Separate CSS from Elm

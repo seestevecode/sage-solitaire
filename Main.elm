@@ -161,28 +161,33 @@ shuffledCardsGenerator =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
-        [ Html.div [] [ renderBoard model.board ]
-        , Html.hr [] []
+    let
+        cardView =
+            renderCard model.bonus
 
-        -- , Html.button [ onClick Shuffle ] [ Html.text "Shuffle" ]
-        , Html.div [] [ Html.text <| toString model.bonus ]
-        , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
-        , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
-        , Html.hr [] []
-        , Html.div [] [ Html.text <| toString model ]
-        ]
+        stackView =
+            renderStack cardView
+    in
+        Html.div []
+            [ Html.div [] [ renderBoard stackView model.board ]
+            , Html.hr [] []
+            , Html.div [] [ Html.text <| toString model.bonus ]
+            , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
+            , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+            , Html.hr [] []
+            , Html.div [] [ Html.text <| toString model ]
+            ]
 
 
-renderBoard : Matrix Stack -> Html Msg
-renderBoard board =
+renderBoard : (Stack -> Html Msg) -> Matrix Stack -> Html Msg
+renderBoard stackView board =
     let
         renderRow : Int -> Html Msg
         renderRow y =
             Matrix.getRow y board
                 |> Maybe.map (Array.toList)
                 |> Maybe.withDefault dummyRow
-                |> List.map renderStack
+                |> List.map stackView
                 |> Html.div []
     in
         List.range 0 (Tuple.first board.size - 1)
@@ -190,8 +195,8 @@ renderBoard board =
             |> Html.div []
 
 
-renderStack : Stack -> Html Msg
-renderStack cards =
+renderStack : (Card -> Html Msg) -> Stack -> Html Msg
+renderStack cardView cards =
     Html.div
         [ class "stack"
         , style
@@ -206,7 +211,7 @@ renderStack cards =
         [ cards
             |> List.head
             |> Maybe.withDefault dummyCard
-            |> renderCard
+            |> cardView
         , Html.div
             [ class "stack-size"
             , style
@@ -222,8 +227,8 @@ renderStack cards =
         ]
 
 
-renderCard : Card -> Html Msg
-renderCard { rank, suit } =
+renderCard : Suit -> Card -> Html Msg
+renderCard bonus { rank, suit } =
     Html.div
         [ class "card"
         , style
@@ -237,6 +242,7 @@ renderCard { rank, suit } =
         ]
         [ rankToHtml rank
         , suitToHtml suit
+        , bonusStar bonus suit
         ]
 
 
@@ -316,6 +322,25 @@ suitToHtml suit =
                 ]
             ]
             [ Html.text s ]
+
+
+bonusStar : Suit -> Suit -> Html Msg
+bonusStar bonusSuit cardSuit =
+    let
+        bonusHtml =
+            if cardSuit == bonusSuit then
+                Html.span
+                    [ class "star"
+                    , style
+                        [ ( "color", "orange" ) ]
+                    ]
+                    [ Html.text "★" ]
+            else
+                Html.text ""
+    in
+        Html.div
+            [ class "bonus" ]
+            [ bonusHtml ]
 
 
 
