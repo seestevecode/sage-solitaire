@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList, style)
+import Html.Events exposing (onClick)
 import List.Extra as LExt
 import Matrix exposing (Matrix)
 import Array exposing (toList)
@@ -85,6 +86,7 @@ dummyMatrix =
 
 type Msg
     = OnShuffle (List Card)
+    | SelectCard Card
 
 
 initModel : Model
@@ -144,6 +146,17 @@ update msg model =
             ( { model
                 | board = boardFromDeck cards
                 , bonus = bonusFromDeck cards
+              }
+            , Cmd.none
+            )
+
+        SelectCard card ->
+            ( { model
+                | selected =
+                    if List.member card model.selected then
+                        LExt.remove card model.selected
+                    else
+                        card :: model.selected
               }
             , Cmd.none
             )
@@ -237,6 +250,7 @@ renderCard bonus { rank, suit } =
             , ( "border-radius", "5px" )
             , ( "position", "relative" )
             ]
+        , onClick (SelectCard { rank = rank, suit = suit })
         ]
         [ rankToHtml rank
         , suitToHtml suit

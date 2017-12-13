@@ -17,5 +17,6 @@
 - [x] Generate shuffled deck
 - [x] Highlight bonus cards
 - [x] Redo CSS
-- [ ] Add cards to selected
+- [x] Add/remove cards to/from selected
+- [ ] Highlight selected cards
 - [ ] Separate CSS from Elm
