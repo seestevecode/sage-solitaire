@@ -175,7 +175,7 @@ view : Model -> Html Msg
 view model =
     let
         cardView =
-            renderCard model.bonus.suit
+            renderCard model.selected model.bonus.suit
 
         stackView =
             renderStack cardView
@@ -225,7 +225,7 @@ renderStack cardView cards =
             |> Maybe.withDefault dummyCard
             |> cardView
         , Html.text "🂠"
-            |> List.repeat (List.length cards)
+            |> List.repeat (List.length cards - 1)
             |> Html.div
                 [ class "stack-size"
                 , style
@@ -238,24 +238,49 @@ renderStack cardView cards =
         ]
 
 
-renderCard : Suit -> Card -> Html Msg
-renderCard bonus { rank, suit } =
-    Html.div
-        [ class "card"
-        , style
+renderCard : List Card -> Suit -> Card -> Html Msg
+renderCard selected bonus card =
+    let
+        selectionColor =
+            "gold"
+
+        selectionStyle =
+            ( "box-shadow"
+            , "3px 3px 1px "
+                ++ selectionColor
+                ++ ", -3px -3px 1px "
+                ++ selectionColor
+                ++ ", 3px -3px 1px "
+                ++ selectionColor
+                ++ ", -3px 3px 1px "
+                ++ selectionColor
+            )
+
+        defaultCardStyles =
             [ ( "width", "50px" )
             , ( "height", "70px" )
             , ( "background-color", "white" )
             , ( "margin", "auto" )
+            , ( "border", "1px solid #999" )
             , ( "border-radius", "5px" )
             , ( "position", "relative" )
             ]
-        , onClick (SelectCard { rank = rank, suit = suit })
-        ]
-        [ rankToHtml rank
-        , suitToHtml suit
-        , bonusStar bonus suit
-        ]
+
+        cardStyles =
+            if List.member card selected then
+                selectionStyle :: defaultCardStyles
+            else
+                defaultCardStyles
+    in
+        Html.div
+            [ class "card"
+            , style cardStyles
+            , onClick (SelectCard card)
+            ]
+            [ rankToHtml card.rank
+            , suitToHtml card.suit
+            , bonusStar bonus card.suit
+            ]
 
 
 rankToHtml : Rank -> Html Msg

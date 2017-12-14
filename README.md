@@ -18,5 +18,10 @@
 - [x] Highlight bonus cards
 - [x] Redo CSS
 - [x] Add/remove cards to/from selected
-- [ ] Highlight selected cards
+- [x] Highlight selected cards
+- [ ] Build complete layout
+- [ ] Check for valid selection
+- [ ] Add keyboard controls
+- [ ] Add hint function
+- [ ] Separate into smaller modules
 - [ ] Separate CSS from Elm
