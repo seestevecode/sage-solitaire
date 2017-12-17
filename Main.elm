@@ -119,20 +119,31 @@ standardDeck : List Card
 standardDeck =
     LExt.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
-        [ Ace
-        , Two
-        , Three
-        , Four
-        , Five
-        , Six
-        , Seven
-        , Eight
-        , Nine
-        , Ten
-        , Jack
-        , Queen
-        , King
-        ]
+        orderedRanks
+
+
+loopedRanks : List Rank
+loopedRanks =
+    [ Ace
+    , Two
+    , Three
+    , Four
+    , Five
+    , Six
+    , Seven
+    , Eight
+    , Nine
+    , Ten
+    , Jack
+    , Queen
+    , King
+    , Ace
+    ]
+
+
+orderedRanks : List Rank
+orderedRanks =
+    loopedRanks |> LExt.init |> Maybe.withDefault [ dummyCard.rank ]
 
 
 
@@ -188,6 +199,17 @@ view model =
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
             , Html.div [] [ Html.text <| toString model ]
+            , Html.hr [] []
+            , Html.div []
+                [ Html.text <| toString <| List.length model.selected
+                , Html.text <| toString <| List.map .rank model.selected
+                , Html.text <| toString <| List.map .suit model.selected
+                ]
+            , Html.hr [] []
+            , Html.div []
+                [ Html.text <| toString <| uniqueRanks model.selected
+                , Html.text <| toString <| uniqueSuits model.selected
+                ]
             ]
 
 
@@ -388,6 +410,35 @@ bonusStar bonusSuit cardSuit =
         Html.div
             [ class "bonus" ]
             [ bonusHtml ]
+
+
+uniqueRanks : List Card -> List Rank
+uniqueRanks cards =
+    let
+        rankToInt rank =
+            LExt.elemIndex rank orderedRanks |> Maybe.withDefault 1
+    in
+        cards |> List.map .rank |> LExt.uniqueBy rankToInt
+
+
+uniqueSuits : List Card -> List Suit
+uniqueSuits cards =
+    let
+        suitToInt suit =
+            case suit of
+                Hearts ->
+                    1
+
+                Clubs ->
+                    2
+
+                Diamonds ->
+                    3
+
+                Spades ->
+                    4
+    in
+        cards |> List.map .suit |> LExt.uniqueBy suitToInt
 
 
 

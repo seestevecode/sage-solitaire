@@ -19,6 +19,7 @@
 - [x] Redo CSS
 - [x] Add/remove cards to/from selected
 - [x] Highlight selected cards
+- [x] Determine unique ranks and suits of selection
 - [ ] Build complete layout
 - [ ] Check for valid selection
 - [ ] Add keyboard controls
