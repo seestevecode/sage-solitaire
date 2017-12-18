@@ -20,8 +20,10 @@
 - [x] Add/remove cards to/from selected
 - [x] Highlight selected cards
 - [x] Determine unique ranks and suits of selection
+- [x] Refactor model and remove matrices
+- [ ] Check for valid hand selection
+- [ ] Check for selection over multiple rows
 - [ ] Build complete layout
-- [ ] Check for valid selection
 - [ ] Add keyboard controls
 - [ ] Add hint function
 - [ ] Separate into smaller modules

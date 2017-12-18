@@ -4,8 +4,6 @@ import Html exposing (Html)
 import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (onClick)
 import List.Extra as LExt
-import Matrix exposing (Matrix)
-import Array exposing (toList)
 import Random exposing (Generator)
 import Random.List
 
@@ -30,15 +28,31 @@ init =
 
 
 type alias Model =
-    { board : Matrix Stack
+    { board : Board
     , bonus : Card
     , score : Int
     , trashes : Int
-    , selected : List Card
+    , selected : Selection
     }
 
 
+type alias Board =
+    List Row
+
+
+type alias Row =
+    List Stack
+
+
 type alias Stack =
+    List Card
+
+
+type alias Selection =
+    List Card
+
+
+type alias Deck =
     List Card
 
 
@@ -74,14 +88,14 @@ dummyCard =
     Card Ace Spades
 
 
-dummyRow : List Stack
+dummyRow : Row
 dummyRow =
     [ [ dummyCard ] ]
 
 
-dummyMatrix : Matrix Stack
-dummyMatrix =
-    Matrix.repeat 3 3 [ dummyCard ]
+dummyBoard : Board
+dummyBoard =
+    List.repeat 3 dummyRow
 
 
 type Msg
@@ -99,23 +113,20 @@ initModel =
     }
 
 
-boardFromDeck : List Card -> Matrix Stack
+boardFromDeck : Deck -> Board
 boardFromDeck deck =
     LExt.init deck
         |> Maybe.withDefault (List.repeat 51 dummyCard)
         |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
         |> LExt.groupsOf 3
-        |> Matrix.fromList
-        |> Maybe.withDefault dummyMatrix
 
 
-bonusFromDeck : List Card -> Card
+bonusFromDeck : Deck -> Card
 bonusFromDeck deck =
-    LExt.last deck
-        |> Maybe.withDefault dummyCard
+    LExt.last deck |> Maybe.withDefault dummyCard
 
 
-standardDeck : List Card
+standardDeck : Deck
 standardDeck =
     LExt.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
@@ -173,7 +184,7 @@ update msg model =
             )
 
 
-shuffledCardsGenerator : Generator (List Card)
+shuffledCardsGenerator : Generator Deck
 shuffledCardsGenerator =
     Random.List.shuffle standardDeck
 
@@ -210,21 +221,23 @@ view model =
                 [ Html.text <| toString <| uniqueRanks model.selected
                 , Html.text <| toString <| uniqueSuits model.selected
                 ]
+            , Html.hr [] []
+            , Html.div []
+                [ Html.text <| toString <| fullHouse model.selected ]
             ]
 
 
-renderBoard : (Stack -> Html Msg) -> Matrix Stack -> Html Msg
+renderBoard : (Stack -> Html Msg) -> Board -> Html Msg
 renderBoard stackView board =
     let
         renderRow : Int -> Html Msg
         renderRow y =
-            Matrix.getRow y board
-                |> Maybe.map (Array.toList)
+            LExt.getAt y board
                 |> Maybe.withDefault dummyRow
                 |> List.map stackView
                 |> Html.div []
     in
-        List.range 0 (Tuple.first board.size - 1)
+        List.range 0 (List.length board - 1)
             |> List.map renderRow
             |> Html.div []
 
@@ -260,11 +273,14 @@ renderStack cardView cards =
         ]
 
 
-renderCard : List Card -> Suit -> Card -> Html Msg
+renderCard : Selection -> Suit -> Card -> Html Msg
 renderCard selected bonus card =
     let
         selectionColor =
-            "gold"
+            if validSelection selected then
+                "gold"
+            else
+                "red"
 
         selectionStyle =
             ( "box-shadow"
@@ -303,6 +319,74 @@ renderCard selected bonus card =
             , suitToHtml card.suit
             , bonusStar bonus card.suit
             ]
+
+
+validSelection : Selection -> Bool
+validSelection sel =
+    pair sel
+        || threeCardStraight sel
+        || threeOfAKind sel
+        || fiveCardStraight sel
+        || fullHouse sel
+        || flush sel
+        || fourOfAKind sel
+        || straightFlush sel
+
+
+pair : Selection -> Bool
+pair sel =
+    (List.length sel == 2) && (List.length (uniqueRanks sel) == 1)
+
+
+threeOfAKind : Selection -> Bool
+threeOfAKind sel =
+    (List.length sel == 3) && (List.length (uniqueRanks sel) == 1)
+
+
+fourOfAKind : Selection -> Bool
+fourOfAKind sel =
+    (List.length sel == 4) && (List.length (uniqueRanks sel) == 1)
+
+
+flush : Selection -> Bool
+flush sel =
+    (List.length sel == 5) && (List.length (uniqueSuits sel) == 1)
+
+
+straight : Selection -> Bool
+straight sel =
+    sel
+        |> List.map .rank
+        |> LExt.permutations
+        |> List.any (flip LExt.isInfixOf loopedRanks)
+
+
+threeCardStraight : Selection -> Bool
+threeCardStraight sel =
+    (List.length sel == 3) && straight sel
+
+
+fiveCardStraight : Selection -> Bool
+fiveCardStraight sel =
+    (List.length sel == 5) && straight sel
+
+
+straightFlush : Selection -> Bool
+straightFlush sel =
+    fiveCardStraight sel && flush sel
+
+
+fullHouse : Selection -> Bool
+fullHouse sel =
+    let
+        listCounts =
+            sel
+                |> List.map .rank
+                |> List.sortBy rankToInt
+                |> LExt.group
+                |> List.map List.length
+    in
+        listCounts == [ 2, 3 ] || listCounts == [ 3, 2 ]
 
 
 rankToHtml : Rank -> Html Msg
@@ -412,33 +496,35 @@ bonusStar bonusSuit cardSuit =
             [ bonusHtml ]
 
 
-uniqueRanks : List Card -> List Rank
+uniqueRanks : Selection -> List Rank
 uniqueRanks cards =
-    let
-        rankToInt rank =
-            LExt.elemIndex rank orderedRanks |> Maybe.withDefault 1
-    in
-        cards |> List.map .rank |> LExt.uniqueBy rankToInt
+    cards |> List.map .rank |> LExt.uniqueBy rankToInt
 
 
-uniqueSuits : List Card -> List Suit
+rankToInt : Rank -> Int
+rankToInt rank =
+    LExt.elemIndex rank orderedRanks |> Maybe.withDefault 1
+
+
+uniqueSuits : Selection -> List Suit
 uniqueSuits cards =
-    let
-        suitToInt suit =
-            case suit of
-                Hearts ->
-                    1
+    cards |> List.map .suit |> LExt.uniqueBy suitToInt
 
-                Clubs ->
-                    2
 
-                Diamonds ->
-                    3
+suitToInt : Suit -> Int
+suitToInt suit =
+    case suit of
+        Hearts ->
+            1
 
-                Spades ->
-                    4
-    in
-        cards |> List.map .suit |> LExt.uniqueBy suitToInt
+        Clubs ->
+            2
+
+        Diamonds ->
+            3
+
+        Spades ->
+            4
 
 
 
