@@ -7,6 +7,7 @@ import List.Extra as ListX
 import Random exposing (Generator)
 import Random.List
 import Maybe.Extra as MaybeX
+import Set exposing (Set)
 
 
 main : Program Never Model Msg
@@ -197,8 +198,11 @@ shuffledCardsGenerator =
 view : Model -> Html Msg
 view model =
     let
+        topCards =
+            visibleCards model.board
+
         cardView =
-            viewCard model.selected model.bonus.suit
+            viewCard model.selected topCards model.bonus.suit
 
         stackView =
             viewStack cardView
@@ -211,7 +215,10 @@ view model =
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
             , Html.div []
-                [ Html.text <| toString <| visibleCards model.board ]
+                [ Html.p [] [ Html.text <| toString <| topCards ]
+                , Html.p [] [ Html.text <| toString <| model.selected ]
+                , Html.p [] [ Html.text <| toString <| uniqueRows model.selected topCards ]
+                ]
             ]
 
 
@@ -222,6 +229,29 @@ visibleCards board =
         |> List.map List.head
         |> MaybeX.values
         |> ListX.groupsOf 3
+
+
+inRow : Card -> Int -> List Card -> Maybe Int
+inRow target rownum row =
+    if List.member target row then
+        Just rownum
+    else
+        Nothing
+
+
+inRowAll : List (List Card) -> Card -> List Int
+inRowAll grid target =
+    grid
+        |> List.indexedMap (inRow target)
+        |> List.filterMap identity
+
+
+uniqueRows : List Card -> List (List Card) -> Int
+uniqueRows searches grid =
+    searches
+        |> List.concatMap (inRowAll grid)
+        |> Set.fromList
+        |> Set.size
 
 
 viewBoard : (Stack -> Html Msg) -> Board -> Html Msg
@@ -270,11 +300,11 @@ viewStack cardView cards =
         ]
 
 
-viewCard : Selection -> Suit -> Card -> Html Msg
-viewCard selected bonus card =
+viewCard : Selection -> List (List Card) -> Suit -> Card -> Html Msg
+viewCard selected visible bonus card =
     let
         selectionColor =
-            if validSelection selected then
+            if (validHand selected) && (uniqueRows selected visible > 1) then
                 "gold"
             else
                 "red"
@@ -318,8 +348,8 @@ viewCard selected bonus card =
             ]
 
 
-validSelection : Selection -> Bool
-validSelection sel =
+validHand : Selection -> Bool
+validHand sel =
     pair sel
         || threeCardStraight sel
         || threeOfAKind sel

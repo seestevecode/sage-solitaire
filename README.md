@@ -22,7 +22,9 @@
 - [x] Determine unique ranks and suits of selection
 - [x] Refactor model and remove matrices
 - [x] Check for valid hand selection
-- [ ] Check for selection over multiple rows
+- [x] Check for selection over multiple rows
+- [ ] Trash single card
+- [ ] Submit valid hand
 - [ ] Build complete layout
 - [ ] Add keyboard controls
 - [ ] Add hint function
