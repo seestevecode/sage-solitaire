@@ -30,32 +30,12 @@ init =
 
 
 type alias Model =
-    { board : Board
+    { board : List (List (List Card))
     , bonus : Card
     , score : Int
     , trashes : Int
-    , selected : Selection
+    , selected : List Card
     }
-
-
-type alias Board =
-    List Row
-
-
-type alias Row =
-    List Stack
-
-
-type alias Stack =
-    List Card
-
-
-type alias Selection =
-    List Card
-
-
-type alias Deck =
-    List Card
 
 
 type alias Card =
@@ -90,18 +70,18 @@ dummyCard =
     Card Ace Spades
 
 
-dummyRow : Row
+dummyRow : List (List Card)
 dummyRow =
     [ [ dummyCard ] ]
 
 
-dummyBoard : Board
+dummyBoard : List (List (List Card))
 dummyBoard =
     List.repeat 3 dummyRow
 
 
 type Msg
-    = OnShuffle Deck
+    = OnShuffle (List Card)
     | ToggleCard Card
     | Trash Card
 
@@ -116,7 +96,7 @@ initModel =
     }
 
 
-boardFromDeck : Deck -> Board
+boardFromDeck : List Card -> List (List (List Card))
 boardFromDeck deck =
     ListX.init deck
         |> Maybe.withDefault (List.repeat 51 dummyCard)
@@ -124,12 +104,12 @@ boardFromDeck deck =
         |> ListX.groupsOf 3
 
 
-bonusFromDeck : Deck -> Card
+bonusFromDeck : List Card -> Card
 bonusFromDeck deck =
     ListX.last deck |> Maybe.withDefault dummyCard
 
 
-standardDeck : Deck
+standardDeck : List Card
 standardDeck =
     ListX.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
@@ -196,7 +176,7 @@ update msg model =
             )
 
 
-shuffledCardsGenerator : Generator Deck
+shuffledCardsGenerator : Generator (List Card)
 shuffledCardsGenerator =
     Random.List.shuffle standardDeck
 
@@ -226,9 +206,9 @@ view model =
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
             , Html.div []
-                [ Html.p [] [ Html.text <| toString <| topCards ]
-                , Html.p [] [ Html.text <| toString <| model.selected ]
-                , Html.p [] [ Html.text <| toString <| uniqueRows model.selected topCards ]
+                [ Html.p [] [ Html.text <| "Top cards: " ++ toString topCards ]
+                , Html.p [] [ Html.text <| "Selected: " ++ toString model.selected ]
+                , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected topCards) ]
                 ]
             ]
 
@@ -245,7 +225,7 @@ viewActions selected trashes =
         Html.text ""
 
 
-visibleCards : Board -> List (List Card)
+visibleCards : List (List (List Card)) -> List (List Card)
 visibleCards board =
     board
         |> List.concat
@@ -277,7 +257,7 @@ uniqueRows searches grid =
         |> Set.size
 
 
-viewBoard : (Stack -> Html Msg) -> Board -> Html Msg
+viewBoard : (List Card -> Html Msg) -> List (List (List Card)) -> Html Msg
 viewBoard stackView board =
     let
         viewRow : Int -> Html Msg
@@ -292,38 +272,43 @@ viewBoard stackView board =
             |> Html.div []
 
 
-viewStack : (Card -> Html Msg) -> Stack -> Html Msg
+viewStack : (Card -> Html Msg) -> List Card -> Html Msg
 viewStack cardView cards =
-    Html.div
-        [ class "stack"
-        , style
-            [ ( "display", "table-cell" )
-            , ( "width", "100px" )
-            , ( "height", "100px" )
-            , ( "border", "1px solid #0c4" )
-            , ( "background-color", "#093" )
-            , ( "padding", "15px 25px" )
-            ]
-        ]
-        [ cards
-            |> List.head
-            |> Maybe.withDefault dummyCard
-            |> cardView
-        , Html.text "🂠"
-            |> List.repeat (List.length cards - 1)
-            |> Html.div
-                [ class "stack-size"
-                , style
-                    [ ( "margin", "auto" )
-                    , ( "padding-top", "10px" )
-                    , ( "color", "white" )
-                    , ( "text-align", "center" )
-                    ]
+    let
+        stackAtts =
+            [ class "stack"
+            , style
+                [ ( "display", "table-cell" )
+                , ( "width", "100px" )
+                , ( "height", "100px" )
+                , ( "border", "1px solid #0c4" )
+                , ( "background-color", "#093" )
+                , ( "padding", "15px 25px" )
                 ]
-        ]
+            ]
+    in
+        case List.head cards of
+            Just card ->
+                Html.div stackAtts
+                    [ cardView card
+                    , Html.text "🂠"
+                        |> List.repeat (List.length cards - 1)
+                        |> Html.div
+                            [ class "stack-size"
+                            , style
+                                [ ( "margin", "auto" )
+                                , ( "padding-top", "10px" )
+                                , ( "color", "white" )
+                                , ( "text-align", "center" )
+                                ]
+                            ]
+                    ]
+
+            Nothing ->
+                Html.div stackAtts [ Html.text "" ]
 
 
-viewCard : Selection -> List (List Card) -> Suit -> Card -> Html Msg
+viewCard : List Card -> List (List Card) -> Suit -> Card -> Html Msg
 viewCard selected visible bonus card =
     let
         selectionColor =
@@ -386,7 +371,7 @@ removeCardFromBoard card board =
     board |> List.map (removeCardFromRow card)
 
 
-validHand : Selection -> Bool
+validHand : List Card -> Bool
 validHand sel =
     pair sel
         || threeCardStraight sel
@@ -398,27 +383,27 @@ validHand sel =
         || straightFlush sel
 
 
-pair : Selection -> Bool
+pair : List Card -> Bool
 pair sel =
     (List.length sel == 2) && (List.length (uniqueRanks sel) == 1)
 
 
-threeOfAKind : Selection -> Bool
+threeOfAKind : List Card -> Bool
 threeOfAKind sel =
     (List.length sel == 3) && (List.length (uniqueRanks sel) == 1)
 
 
-fourOfAKind : Selection -> Bool
+fourOfAKind : List Card -> Bool
 fourOfAKind sel =
     (List.length sel == 4) && (List.length (uniqueRanks sel) == 1)
 
 
-flush : Selection -> Bool
+flush : List Card -> Bool
 flush sel =
     (List.length sel == 5) && (List.length (uniqueSuits sel) == 1)
 
 
-straight : Selection -> Bool
+straight : List Card -> Bool
 straight sel =
     sel
         |> List.map .rank
@@ -426,22 +411,22 @@ straight sel =
         |> List.any (flip ListX.isInfixOf loopedRanks)
 
 
-threeCardStraight : Selection -> Bool
+threeCardStraight : List Card -> Bool
 threeCardStraight sel =
     (List.length sel == 3) && straight sel
 
 
-fiveCardStraight : Selection -> Bool
+fiveCardStraight : List Card -> Bool
 fiveCardStraight sel =
     (List.length sel == 5) && straight sel
 
 
-straightFlush : Selection -> Bool
+straightFlush : List Card -> Bool
 straightFlush sel =
     fiveCardStraight sel && flush sel
 
 
-fullHouse : Selection -> Bool
+fullHouse : List Card -> Bool
 fullHouse sel =
     let
         listCounts =
@@ -561,7 +546,7 @@ bonusStar bonusSuit cardSuit =
             [ bonusHtml ]
 
 
-uniqueRanks : Selection -> List Rank
+uniqueRanks : List Card -> List Rank
 uniqueRanks cards =
     cards |> List.map .rank |> ListX.uniqueBy rankToInt
 
@@ -571,7 +556,7 @@ rankToInt rank =
     ListX.elemIndex rank orderedRanks |> Maybe.withDefault 1
 
 
-uniqueSuits : Selection -> List Suit
+uniqueSuits : List Card -> List Suit
 uniqueSuits cards =
     cards |> List.map .suit |> ListX.uniqueBy suitToInt
 

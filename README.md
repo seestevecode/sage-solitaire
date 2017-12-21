@@ -24,8 +24,10 @@
 - [x] Check for valid hand selection
 - [x] Check for selection over multiple rows
 - [x] Trash single card
-- [ ] Render empty cell
+- [x] Render empty cell
+- [ ] Fix row selection count on rows with empty cell
 - [ ] Submit valid hand
+- [ ] Update score on hand submission
 - [ ] Build complete layout
 - [ ] Add keyboard controls
 - [ ] Add hint function
