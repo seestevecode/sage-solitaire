@@ -102,7 +102,8 @@ dummyBoard =
 
 type Msg
     = OnShuffle Deck
-    | SelectCard Card
+    | ToggleCard Card
+    | Trash Card
 
 
 initModel : Model
@@ -174,13 +175,22 @@ update msg model =
             , Cmd.none
             )
 
-        SelectCard card ->
+        ToggleCard card ->
             ( { model
                 | selected =
                     if List.member card model.selected then
                         ListX.remove card model.selected
                     else
                         card :: model.selected
+              }
+            , Cmd.none
+            )
+
+        Trash card ->
+            ( { model
+                | board = removeCardFromBoard card model.board
+                , selected = []
+                , trashes = model.trashes - 1
               }
             , Cmd.none
             )
@@ -209,6 +219,7 @@ view model =
     in
         Html.div []
             [ Html.div [] [ viewBoard stackView model.board ]
+            , Html.div [] [ viewActions model.selected model.trashes ]
             , Html.hr [] []
             , Html.div [] [ Html.text <| "Bonus: " ++ toString model.bonus ]
             , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
@@ -220,6 +231,18 @@ view model =
                 , Html.p [] [ Html.text <| toString <| uniqueRows model.selected topCards ]
                 ]
             ]
+
+
+viewActions : List Card -> Int -> Html Msg
+viewActions selected trashes =
+    if List.length selected == 1 && trashes > 0 then
+        let
+            card =
+                List.head selected |> Maybe.withDefault dummyCard
+        in
+            Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
+    else
+        Html.text ""
 
 
 visibleCards : Board -> List (List Card)
@@ -340,12 +363,27 @@ viewCard selected visible bonus card =
         Html.div
             [ class "card"
             , style cardStyles
-            , onClick (SelectCard card)
+            , onClick (ToggleCard card)
             ]
             [ rankToHtml card.rank
             , suitToHtml card.suit
             , bonusStar bonus card.suit
             ]
+
+
+removeCardFromStack : Card -> List Card -> List Card
+removeCardFromStack card stack =
+    ListX.remove card stack
+
+
+removeCardFromRow : Card -> List (List Card) -> List (List Card)
+removeCardFromRow card row =
+    row |> List.map (removeCardFromStack card)
+
+
+removeCardFromBoard : Card -> List (List (List Card)) -> List (List (List Card))
+removeCardFromBoard card board =
+    board |> List.map (removeCardFromRow card)
 
 
 validHand : Selection -> Bool

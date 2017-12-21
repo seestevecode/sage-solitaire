@@ -23,7 +23,8 @@
 - [x] Refactor model and remove matrices
 - [x] Check for valid hand selection
 - [x] Check for selection over multiple rows
-- [ ] Trash single card
+- [x] Trash single card
+- [ ] Render empty cell
 - [ ] Submit valid hand
 - [ ] Build complete layout
 - [ ] Add keyboard controls
