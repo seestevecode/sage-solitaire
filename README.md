@@ -21,7 +21,7 @@
 - [x] Highlight selected cards
 - [x] Determine unique ranks and suits of selection
 - [x] Refactor model and remove matrices
-- [ ] Check for valid hand selection
+- [x] Check for valid hand selection
 - [ ] Check for selection over multiple rows
 - [ ] Build complete layout
 - [ ] Add keyboard controls

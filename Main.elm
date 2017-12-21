@@ -3,9 +3,10 @@ module Main exposing (..)
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (onClick)
-import List.Extra as LExt
+import List.Extra as ListX
 import Random exposing (Generator)
 import Random.List
+import Maybe.Extra as MaybeX
 
 
 main : Program Never Model Msg
@@ -99,7 +100,7 @@ dummyBoard =
 
 
 type Msg
-    = OnShuffle (List Card)
+    = OnShuffle Deck
     | SelectCard Card
 
 
@@ -115,20 +116,20 @@ initModel =
 
 boardFromDeck : Deck -> Board
 boardFromDeck deck =
-    LExt.init deck
+    ListX.init deck
         |> Maybe.withDefault (List.repeat 51 dummyCard)
-        |> LExt.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
-        |> LExt.groupsOf 3
+        |> ListX.groupsOfVarying [ 8, 8, 8, 7, 6, 5, 4, 3, 2 ]
+        |> ListX.groupsOf 3
 
 
 bonusFromDeck : Deck -> Card
 bonusFromDeck deck =
-    LExt.last deck |> Maybe.withDefault dummyCard
+    ListX.last deck |> Maybe.withDefault dummyCard
 
 
 standardDeck : Deck
 standardDeck =
-    LExt.lift2 (flip Card)
+    ListX.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
         orderedRanks
 
@@ -154,7 +155,7 @@ loopedRanks =
 
 orderedRanks : List Rank
 orderedRanks =
-    loopedRanks |> LExt.init |> Maybe.withDefault [ dummyCard.rank ]
+    loopedRanks |> ListX.init |> Maybe.withDefault [ dummyCard.rank ]
 
 
 
@@ -176,7 +177,7 @@ update msg model =
             ( { model
                 | selected =
                     if List.member card model.selected then
-                        LExt.remove card model.selected
+                        ListX.remove card model.selected
                     else
                         card :: model.selected
               }
@@ -197,53 +198,49 @@ view : Model -> Html Msg
 view model =
     let
         cardView =
-            renderCard model.selected model.bonus.suit
+            viewCard model.selected model.bonus.suit
 
         stackView =
-            renderStack cardView
+            viewStack cardView
     in
         Html.div []
-            [ Html.div [] [ renderBoard stackView model.board ]
+            [ Html.div [] [ viewBoard stackView model.board ]
             , Html.hr [] []
             , Html.div [] [ Html.text <| "Bonus: " ++ toString model.bonus ]
             , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
-            , Html.div [] [ Html.text <| toString model ]
-            , Html.hr [] []
             , Html.div []
-                [ Html.text <| toString <| List.length model.selected
-                , Html.text <| toString <| List.map .rank model.selected
-                , Html.text <| toString <| List.map .suit model.selected
-                ]
-            , Html.hr [] []
-            , Html.div []
-                [ Html.text <| toString <| uniqueRanks model.selected
-                , Html.text <| toString <| uniqueSuits model.selected
-                ]
-            , Html.hr [] []
-            , Html.div []
-                [ Html.text <| toString <| fullHouse model.selected ]
+                [ Html.text <| toString <| visibleCards model.board ]
             ]
 
 
-renderBoard : (Stack -> Html Msg) -> Board -> Html Msg
-renderBoard stackView board =
+visibleCards : Board -> List (List Card)
+visibleCards board =
+    board
+        |> List.concat
+        |> List.map List.head
+        |> MaybeX.values
+        |> ListX.groupsOf 3
+
+
+viewBoard : (Stack -> Html Msg) -> Board -> Html Msg
+viewBoard stackView board =
     let
-        renderRow : Int -> Html Msg
-        renderRow y =
-            LExt.getAt y board
+        viewRow : Int -> Html Msg
+        viewRow y =
+            ListX.getAt y board
                 |> Maybe.withDefault dummyRow
                 |> List.map stackView
                 |> Html.div []
     in
         List.range 0 (List.length board - 1)
-            |> List.map renderRow
+            |> List.map viewRow
             |> Html.div []
 
 
-renderStack : (Card -> Html Msg) -> Stack -> Html Msg
-renderStack cardView cards =
+viewStack : (Card -> Html Msg) -> Stack -> Html Msg
+viewStack cardView cards =
     Html.div
         [ class "stack"
         , style
@@ -273,8 +270,8 @@ renderStack cardView cards =
         ]
 
 
-renderCard : Selection -> Suit -> Card -> Html Msg
-renderCard selected bonus card =
+viewCard : Selection -> Suit -> Card -> Html Msg
+viewCard selected bonus card =
     let
         selectionColor =
             if validSelection selected then
@@ -357,8 +354,8 @@ straight : Selection -> Bool
 straight sel =
     sel
         |> List.map .rank
-        |> LExt.permutations
-        |> List.any (flip LExt.isInfixOf loopedRanks)
+        |> ListX.permutations
+        |> List.any (flip ListX.isInfixOf loopedRanks)
 
 
 threeCardStraight : Selection -> Bool
@@ -383,7 +380,7 @@ fullHouse sel =
             sel
                 |> List.map .rank
                 |> List.sortBy rankToInt
-                |> LExt.group
+                |> ListX.group
                 |> List.map List.length
     in
         listCounts == [ 2, 3 ] || listCounts == [ 3, 2 ]
@@ -498,17 +495,17 @@ bonusStar bonusSuit cardSuit =
 
 uniqueRanks : Selection -> List Rank
 uniqueRanks cards =
-    cards |> List.map .rank |> LExt.uniqueBy rankToInt
+    cards |> List.map .rank |> ListX.uniqueBy rankToInt
 
 
 rankToInt : Rank -> Int
 rankToInt rank =
-    LExt.elemIndex rank orderedRanks |> Maybe.withDefault 1
+    ListX.elemIndex rank orderedRanks |> Maybe.withDefault 1
 
 
 uniqueSuits : Selection -> List Suit
 uniqueSuits cards =
-    cards |> List.map .suit |> LExt.uniqueBy suitToInt
+    cards |> List.map .suit |> ListX.uniqueBy suitToInt
 
 
 suitToInt : Suit -> Int
