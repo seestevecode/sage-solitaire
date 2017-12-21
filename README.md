@@ -25,7 +25,7 @@
 - [x] Check for selection over multiple rows
 - [x] Trash single card
 - [x] Render empty cell
-- [ ] Fix row selection count on rows with empty cell
+- [x] Fix row selection count on rows with empty cell
 - [ ] Submit valid hand
 - [ ] Update score on hand submission
 - [ ] Build complete layout

@@ -6,7 +6,6 @@ import Html.Events exposing (onClick)
 import List.Extra as ListX
 import Random exposing (Generator)
 import Random.List
-import Maybe.Extra as MaybeX
 import Set exposing (Set)
 
 
@@ -188,11 +187,8 @@ shuffledCardsGenerator =
 view : Model -> Html Msg
 view model =
     let
-        topCards =
-            visibleCards model.board
-
         cardView =
-            viewCard model.selected topCards model.bonus.suit
+            viewCard model.selected model.board model.bonus.suit
 
         stackView =
             viewStack cardView
@@ -206,9 +202,9 @@ view model =
             , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
             , Html.div []
-                [ Html.p [] [ Html.text <| "Top cards: " ++ toString topCards ]
+                [ Html.p [] [ Html.text <| "Top cards: " ++ toString model.board ]
                 , Html.p [] [ Html.text <| "Selected: " ++ toString model.selected ]
-                , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected topCards) ]
+                , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected model.board) ]
                 ]
             ]
 
@@ -225,31 +221,22 @@ viewActions selected trashes =
         Html.text ""
 
 
-visibleCards : List (List (List Card)) -> List (List Card)
-visibleCards board =
-    board
-        |> List.concat
-        |> List.map List.head
-        |> MaybeX.values
-        |> ListX.groupsOf 3
-
-
-inRow : Card -> Int -> List Card -> Maybe Int
+inRow : Card -> Int -> List (List Card) -> Maybe Int
 inRow target rownum row =
-    if List.member target row then
+    if List.member target (List.concat row) then
         Just rownum
     else
         Nothing
 
 
-inRowAll : List (List Card) -> Card -> List Int
+inRowAll : List (List (List Card)) -> Card -> List Int
 inRowAll grid target =
     grid
         |> List.indexedMap (inRow target)
         |> List.filterMap identity
 
 
-uniqueRows : List Card -> List (List Card) -> Int
+uniqueRows : List Card -> List (List (List Card)) -> Int
 uniqueRows searches grid =
     searches
         |> List.concatMap (inRowAll grid)
@@ -308,7 +295,7 @@ viewStack cardView cards =
                 Html.div stackAtts [ Html.text "" ]
 
 
-viewCard : List Card -> List (List Card) -> Suit -> Card -> Html Msg
+viewCard : List Card -> List (List (List Card)) -> Suit -> Card -> Html Msg
 viewCard selected visible bonus card =
     let
         selectionColor =
