@@ -26,8 +26,11 @@
 - [x] Trash single card
 - [x] Render empty cell
 - [x] Fix row selection count on rows with empty cell
-- [ ] Submit valid hand
-- [ ] Update score on hand submission
+- [x] Submit valid hand
+- [x] Update score on hand submission
+- [ ] Implement bonus for clearing a stack
+- [ ] Fix offset of card with no others in stack
+- [ ] Implement end of game conditions
 - [ ] Build complete layout
 - [ ] Add keyboard controls
 - [ ] Add hint function

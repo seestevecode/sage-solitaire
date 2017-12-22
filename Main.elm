@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html)
-import Html.Attributes exposing (class, classList, style)
+import Html.Attributes exposing (id, class, classList, style)
 import Html.Events exposing (onClick)
 import List.Extra as ListX
 import Random exposing (Generator)
@@ -83,6 +83,7 @@ type Msg
     = OnShuffle (List Card)
     | ToggleCard Card
     | Trash Card
+    | SubmitHand (List Card)
 
 
 initModel : Model
@@ -174,10 +175,57 @@ update msg model =
             , Cmd.none
             )
 
+        SubmitHand cards ->
+            ( { model
+                | board = cards |> List.foldl removeCardFromBoard model.board
+                , trashes = min initModel.trashes (model.trashes + 1)
+                , selected = []
+                , score =
+                    let
+                        hand =
+                            scoreHand model.selected model.bonus.suit
+                    in
+                        if hand.isBonus then
+                            model.score + (hand.baseScore * 2)
+                        else
+                            model.score + hand.baseScore
+              }
+            , Cmd.none
+            )
+
 
 shuffledCardsGenerator : Generator (List Card)
 shuffledCardsGenerator =
     Random.List.shuffle standardDeck
+
+
+scoreHand : List Card -> Suit -> { handName : String, baseScore : Int, isBonus : Bool }
+scoreHand cards bonus =
+    let
+        ( handName, baseScore ) =
+            if pair cards then
+                ( "Pair", 10 )
+            else if threeCardStraight cards then
+                ( "3-card Straight", 20 )
+            else if threeOfAKind cards then
+                ( "Three of a Kind", 30 )
+            else if fiveCardStraight cards then
+                ( "5-card Stright", 50 )
+            else if fullHouse cards then
+                ( "Full House", 70 )
+            else if flush cards then
+                ( "Flush", 90 )
+            else if fourOfAKind cards then
+                ( "Four of a Kind", 100 )
+            else if straightFlush cards then
+                ( "Straight Flush", 150 )
+            else
+                ( "No hand", 0 )
+
+        isBonus =
+            cards |> List.map .suit |> List.any (\suit -> suit == bonus)
+    in
+        { handName = handName, baseScore = baseScore, isBonus = isBonus }
 
 
 
@@ -194,12 +242,12 @@ view model =
             viewStack cardView
     in
         Html.div []
-            [ Html.div [] [ viewBoard stackView model.board ]
-            , Html.div [] [ viewActions model.selected model.trashes ]
+            [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
+            , Html.div [ id "actions" ] [ viewActions model.selected model.bonus.suit model.board model.trashes ]
             , Html.hr [] []
-            , Html.div [] [ Html.text <| "Bonus: " ++ toString model.bonus ]
-            , Html.div [] [ Html.text <| "Score: " ++ toString model.score ]
-            , Html.div [] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+            , Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
+            , Html.div [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
+            , Html.div [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
             , Html.hr [] []
             , Html.div []
                 [ Html.p [] [ Html.text <| "Top cards: " ++ toString model.board ]
@@ -209,14 +257,34 @@ view model =
             ]
 
 
-viewActions : List Card -> Int -> Html Msg
-viewActions selected trashes =
+viewActions : List Card -> Suit -> List (List (List Card)) -> Int -> Html Msg
+viewActions selected bonus board trashes =
     if List.length selected == 1 && trashes > 0 then
         let
             card =
                 List.head selected |> Maybe.withDefault dummyCard
         in
             Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
+    else if validHand selected && (uniqueRows selected board > 1) then
+        let
+            hand =
+                scoreHand selected bonus
+
+            bonusText =
+                if hand.isBonus then
+                    " x2"
+                else
+                    ""
+        in
+            Html.button [ onClick (SubmitHand selected) ]
+                [ hand.handName
+                    ++ " ("
+                    ++ toString hand.baseScore
+                    ++ " pts"
+                    ++ bonusText
+                    ++ ")"
+                    |> Html.text
+                ]
     else
         Html.text ""
 
@@ -296,10 +364,10 @@ viewStack cardView cards =
 
 
 viewCard : List Card -> List (List (List Card)) -> Suit -> Card -> Html Msg
-viewCard selected visible bonus card =
+viewCard selected board bonus card =
     let
         selectionColor =
-            if (validHand selected) && (uniqueRows selected visible > 1) then
+            if (validHand selected) && (uniqueRows selected board > 1) then
                 "gold"
             else
                 "red"
@@ -324,6 +392,7 @@ viewCard selected visible bonus card =
             , ( "border", "1px solid #999" )
             , ( "border-radius", "5px" )
             , ( "position", "relative" )
+            , ( "cursor", "pointer" )
             ]
 
         cardStyles =
