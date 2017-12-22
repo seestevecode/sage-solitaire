@@ -84,6 +84,7 @@ type Msg
     | ToggleCard Card
     | Trash Card
     | SubmitHand (List Card)
+    | Clear
 
 
 initModel : Model
@@ -193,6 +194,13 @@ update msg model =
             , Cmd.none
             )
 
+        Clear ->
+            ( { model
+                | selected = []
+              }
+            , Cmd.none
+            )
+
 
 shuffledCardsGenerator : Generator (List Card)
 shuffledCardsGenerator =
@@ -245,15 +253,22 @@ view model =
             [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
             , Html.div [ id "actions" ] [ viewActions model.selected model.bonus.suit model.board model.trashes ]
             , Html.hr [] []
-            , Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
-            , Html.div [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
-            , Html.div [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
-            , Html.hr [] []
             , Html.div []
-                [ Html.p [] [ Html.text <| "Top cards: " ++ toString model.board ]
-                , Html.p [] [ Html.text <| "Selected: " ++ toString model.selected ]
-                , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected model.board) ]
+                [ Html.p [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
+                , Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
+                , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+                , if List.length model.selected > 0 then
+                    Html.button [ onClick Clear ] [ Html.text "Clear" ]
+                  else
+                    Html.text ""
                 ]
+
+            -- , Html.hr [] []
+            -- , Html.div []
+            --     [ Html.p [] [ Html.text <| "Top cards: " ++ toString model.board ]
+            --     , Html.p [] [ Html.text <| "Selected: " ++ toString model.selected ]
+            --     , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected model.board) ]
+            --     ]
             ]
 
 

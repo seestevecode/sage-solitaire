@@ -28,6 +28,7 @@
 - [x] Fix row selection count on rows with empty cell
 - [x] Submit valid hand
 - [x] Update score on hand submission
+- [x] Add Clear button
 - [ ] Implement bonus for clearing a stack
 - [ ] Fix offset of card with no others in stack
 - [ ] Implement end of game conditions
