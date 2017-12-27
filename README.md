@@ -29,11 +29,12 @@
 - [x] Submit valid hand
 - [x] Update score on hand submission
 - [x] Add Clear button
+- [x] Check for valid hands and add hint function
+- [ ] Build complete layout with CSSGrid
+- [ ] Improve best hand selection
 - [ ] Implement bonus for clearing a stack
 - [ ] Fix offset of card with no others in stack
 - [ ] Implement end of game conditions
-- [ ] Build complete layout
 - [ ] Add keyboard controls
-- [ ] Add hint function
 - [ ] Separate into smaller modules
 - [ ] Separate CSS from Elm

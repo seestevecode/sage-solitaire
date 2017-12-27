@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import List.Extra as ListX
 import Random exposing (Generator)
 import Random.List
-import Set exposing (Set)
+import Maybe.Extra as MaybeX
 
 
 main : Program Never Model Msg
@@ -85,6 +85,7 @@ type Msg
     | Trash Card
     | SubmitHand (List Card)
     | Clear
+    | Hint
 
 
 initModel : Model
@@ -201,13 +202,37 @@ update msg model =
             , Cmd.none
             )
 
+        Hint ->
+            ( { model
+                | selected =
+                    let
+                        scoredHands =
+                            scoredHandsFromBoard model.board model.bonus.suit
+                    in
+                        if List.length scoredHands > 0 then
+                            scoredHands |> bestHandFromScored |> .hand
+                        else
+                            []
+              }
+            , Cmd.none
+            )
+
 
 shuffledCardsGenerator : Generator (List Card)
 shuffledCardsGenerator =
     Random.List.shuffle standardDeck
 
 
-scoreHand : List Card -> Suit -> { handName : String, baseScore : Int, isBonus : Bool }
+type alias ScoredHand =
+    { hand : List Card
+    , handName : String
+    , baseScore : Int
+    , isBonus : Bool
+    , actualScore : Int
+    }
+
+
+scoreHand : List Card -> Suit -> ScoredHand
 scoreHand cards bonus =
     let
         ( handName, baseScore ) =
@@ -218,7 +243,7 @@ scoreHand cards bonus =
             else if threeOfAKind cards then
                 ( "Three of a Kind", 30 )
             else if fiveCardStraight cards then
-                ( "5-card Stright", 50 )
+                ( "5-card Straight", 50 )
             else if fullHouse cards then
                 ( "Full House", 70 )
             else if flush cards then
@@ -233,7 +258,16 @@ scoreHand cards bonus =
         isBonus =
             cards |> List.map .suit |> List.any (\suit -> suit == bonus)
     in
-        { handName = handName, baseScore = baseScore, isBonus = isBonus }
+        { hand = cards
+        , handName = handName
+        , baseScore = baseScore
+        , isBonus = isBonus
+        , actualScore =
+            if isBonus then
+                baseScore * 2
+            else
+                baseScore
+        }
 
 
 
@@ -248,13 +282,20 @@ view model =
 
         stackView =
             viewStack cardView
+
+        scoredHands =
+            scoredHandsFromBoard model.board model.bonus.suit
     in
         Html.div []
             [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
+            , if ListX.isPermutationOf model.selected (bestHandFromScored scoredHands |> .hand) then
+                Html.text ""
+              else
+                Html.button [ id "hint", onClick Hint ] [ Html.text "Hint" ]
             , Html.div [ id "actions" ] [ viewActions model.selected model.bonus.suit model.board model.trashes ]
             , Html.hr [] []
             , Html.div []
-                [ Html.p [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
+                [ Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
                 , Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
                 , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
                 , if List.length model.selected > 0 then
@@ -262,14 +303,56 @@ view model =
                   else
                     Html.text ""
                 ]
-
-            -- , Html.hr [] []
-            -- , Html.div []
-            --     [ Html.p [] [ Html.text <| "Top cards: " ++ toString model.board ]
-            --     , Html.p [] [ Html.text <| "Selected: " ++ toString model.selected ]
-            --     , Html.p [] [ Html.text <| "Rows sel: " ++ toString (uniqueRows model.selected model.board) ]
-            --     ]
+            , Html.hr [] []
+            , Html.div []
+                [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
+                , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
+                ]
             ]
+
+
+scoredHandsFromBoard : List (List (List Card)) -> Suit -> List ScoredHand
+scoredHandsFromBoard board bonus =
+    let
+        validHands =
+            board
+                |> List.concat
+                |> List.map List.head
+                |> MaybeX.values
+                |> ListX.subsequences
+                |> List.filter
+                    (\hand ->
+                        validHand hand
+                            && (List.length (uniqueRows hand board) > 1)
+                    )
+    in
+        validHands |> List.map (\hand -> scoreHand hand bonus)
+
+
+bestHandFromScored : List ScoredHand -> ScoredHand
+bestHandFromScored hands =
+    let
+        maxScore =
+            hands |> List.map .actualScore |> List.maximum |> Maybe.withDefault 0
+
+        highScoringHands =
+            hands
+                |> List.filter (\hand -> hand.actualScore == maxScore)
+
+        maxLengthHighScorers =
+            highScoringHands
+                |> List.map .hand
+                |> List.map List.length
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+        longestHighScorers =
+            highScoringHands
+                |> List.filter (\hand -> List.length hand.hand == maxLengthHighScorers)
+    in
+        longestHighScorers
+            |> List.head
+            |> Maybe.withDefault (ScoredHand [ dummyCard ] "Dummy" 0 False 0)
 
 
 viewActions : List Card -> Suit -> List (List (List Card)) -> Int -> Html Msg
@@ -280,7 +363,7 @@ viewActions selected bonus board trashes =
                 List.head selected |> Maybe.withDefault dummyCard
         in
             Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
-    else if validHand selected && (uniqueRows selected board > 1) then
+    else if validHand selected && List.length (uniqueRows selected board) > 1 then
         let
             hand =
                 scoreHand selected bonus
@@ -319,12 +402,11 @@ inRowAll grid target =
         |> List.filterMap identity
 
 
-uniqueRows : List Card -> List (List (List Card)) -> Int
+uniqueRows : List Card -> List (List (List Card)) -> List Int
 uniqueRows searches grid =
     searches
         |> List.concatMap (inRowAll grid)
-        |> Set.fromList
-        |> Set.size
+        |> ListX.unique
 
 
 viewBoard : (List Card -> Html Msg) -> List (List (List Card)) -> Html Msg
@@ -382,7 +464,7 @@ viewCard : List Card -> List (List (List Card)) -> Suit -> Card -> Html Msg
 viewCard selected board bonus card =
     let
         selectionColor =
-            if (validHand selected) && (uniqueRows selected board > 1) then
+            if validHand selected && List.length (uniqueRows selected board) > 1 then
                 "gold"
             else
                 "red"
