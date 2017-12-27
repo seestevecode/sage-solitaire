@@ -30,6 +30,7 @@
 - [x] Update score on hand submission
 - [x] Add Clear button
 - [x] Check for valid hands and add hint function
+- [x] Add discards to model
 - [ ] Build complete layout with CSSGrid
 - [ ] Improve best hand selection
 - [ ] Implement bonus for clearing a stack

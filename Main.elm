@@ -34,6 +34,7 @@ type alias Model =
     , score : Int
     , trashes : Int
     , selected : List Card
+    , discarded : List Card
     }
 
 
@@ -95,6 +96,7 @@ initModel =
     , score = 0
     , trashes = 2
     , selected = []
+    , discarded = []
     }
 
 
@@ -173,6 +175,7 @@ update msg model =
                 | board = removeCardFromBoard card model.board
                 , selected = []
                 , trashes = model.trashes - 1
+                , discarded = card :: model.discarded
               }
             , Cmd.none
             )
@@ -191,6 +194,7 @@ update msg model =
                             model.score + (hand.baseScore * 2)
                         else
                             model.score + hand.baseScore
+                , discarded = cards ++ model.discarded
               }
             , Cmd.none
             )
@@ -298,6 +302,7 @@ view model =
                 [ Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
                 , Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
                 , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+                , Html.p [ id "discarded" ] [ Html.text <| "Discarded: " ++ toString (List.length model.discarded) ]
                 , if List.length model.selected > 0 then
                     Html.button [ onClick Clear ] [ Html.text "Clear" ]
                   else
@@ -307,6 +312,7 @@ view model =
             , Html.div []
                 [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
                 , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
+                , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
                 ]
             ]
 
