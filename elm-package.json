@@ -8,7 +8,6 @@
     ],
     "exposed-modules": [],
     "dependencies": {
-        "eeue56/elm-flat-matrix": "3.0.2 <= v < 4.0.0",
         "elm-community/list-extra": "7.0.0 <= v < 8.0.0",
         "elm-community/maybe-extra": "4.0.0 <= v < 5.0.0",
         "elm-community/random-extra": "2.0.0 <= v < 3.0.0",

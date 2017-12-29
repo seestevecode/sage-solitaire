@@ -31,11 +31,13 @@
 - [x] Add Clear button
 - [x] Check for valid hands and add hint function
 - [x] Add discards to model
+- [x] Comply with elm-analyse
+- [ ] Add info bar
+- [ ] Add game state to model
+- [ ] Implement bonus for clearing a stack
 - [ ] Build complete layout with CSSGrid
 - [ ] Improve best hand selection
-- [ ] Implement bonus for clearing a stack
 - [ ] Fix offset of card with no others in stack
-- [ ] Implement end of game conditions
 - [ ] Add keyboard controls
 - [ ] Separate into smaller modules
 - [ ] Separate CSS from Elm

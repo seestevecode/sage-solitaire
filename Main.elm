@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes exposing (id, class, classList, style)
@@ -39,7 +39,9 @@ type alias Model =
 
 
 type alias Card =
-    { rank : Rank, suit : Suit }
+    { rank : Rank
+    , suit : Suit
+    }
 
 
 type Rank
@@ -73,11 +75,6 @@ dummyCard =
 dummyRow : List (List Card)
 dummyRow =
     [ [ dummyCard ] ]
-
-
-dummyBoard : List (List (List Card))
-dummyBoard =
-    List.repeat 3 dummyRow
 
 
 type Msg
@@ -652,7 +649,7 @@ rankToHtml rank =
 suitToHtml : Suit -> Html Msg
 suitToHtml suit =
     let
-        ( s, clr ) =
+        ( symbol, colour ) =
             case suit of
                 Hearts ->
                     ( "♥", "red" )
@@ -672,14 +669,14 @@ suitToHtml suit =
                 , ( String.toLower <| toString suit, True )
                 ]
             , style
-                [ ( "color", clr )
+                [ ( "color", colour )
                 , ( "position", "absolute" )
                 , ( "top", "0" )
                 , ( "left", "5px" )
                 , ( "font-size", "30px" )
                 ]
             ]
-            [ Html.text s ]
+            [ Html.text symbol ]
 
 
 bonusStar : Suit -> Suit -> Html Msg
@@ -741,5 +738,5 @@ suitToInt suit =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
