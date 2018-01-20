@@ -35,6 +35,7 @@ type alias Model =
     , trashes : Int
     , selected : List Card
     , discarded : List Card
+    , gameState : GameState
     }
 
 
@@ -67,6 +68,12 @@ type Suit
     | Spades
 
 
+type GameState
+    = NewGame
+    | Playing
+    | GameOver
+
+
 dummyCard : Card
 dummyCard =
     Card Ace Spades
@@ -84,6 +91,7 @@ type Msg
     | SubmitHand (List Card)
     | Clear
     | Hint
+    | StartGame
 
 
 initModel : Model
@@ -94,6 +102,7 @@ initModel =
     , trashes = 2
     , selected = []
     , discarded = []
+    , gameState = NewGame
     }
 
 
@@ -174,6 +183,7 @@ update msg model =
                 , trashes = model.trashes - 1
                 , discarded = card :: model.discarded
               }
+                |> updateGameState
             , Cmd.none
             )
 
@@ -193,15 +203,12 @@ update msg model =
                             model.score + hand.baseScore
                 , discarded = cards ++ model.discarded
               }
+                |> updateGameState
             , Cmd.none
             )
 
         Clear ->
-            ( { model
-                | selected = []
-              }
-            , Cmd.none
-            )
+            ( { model | selected = [] }, Cmd.none )
 
         Hint ->
             ( { model
@@ -218,10 +225,41 @@ update msg model =
             , Cmd.none
             )
 
+        StartGame ->
+            ( updateGameState model, Cmd.none )
+
 
 shuffledCardsGenerator : Generator (List Card)
 shuffledCardsGenerator =
     Random.List.shuffle standardDeck
+
+
+updateGameState : Model -> Model
+updateGameState model =
+    case model.gameState of
+        NewGame ->
+            { model | gameState = Playing }
+
+        Playing ->
+            { model
+                | gameState =
+                    if noMoreMoves model then
+                        GameOver
+                    else
+                        model.gameState
+            }
+
+        GameOver ->
+            model
+
+
+noMoreMoves : Model -> Bool
+noMoreMoves model =
+    let
+        scoredHands =
+            scoredHandsFromBoard model.board model.bonus.suit
+    in
+        List.length scoredHands == 0 && model.trashes == 0
 
 
 type alias ScoredHand =
@@ -277,6 +315,29 @@ scoreHand cards bonus =
 
 view : Model -> Html Msg
 view model =
+    case model.gameState of
+        NewGame ->
+            viewNewGame
+
+        Playing ->
+            viewPlaying model
+
+        GameOver ->
+            viewGameOver
+
+
+viewNewGame : Html Msg
+viewNewGame =
+    Html.button [ onClick StartGame ] [ Html.text "Start new game" ]
+
+
+viewGameOver : Html Msg
+viewGameOver =
+    Html.text "Game over - thanks for playing"
+
+
+viewPlaying : Model -> Html Msg
+viewPlaying model =
     let
         cardView =
             viewCard model.selected model.board model.bonus.suit
@@ -310,6 +371,8 @@ view model =
                 [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
                 , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
                 , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
+                , Html.p [] [ Html.text <| "Game state: " ++ toString model.gameState ]
+                , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
                 ]
             ]
 
