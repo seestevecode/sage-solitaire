@@ -34,6 +34,7 @@
 - [x] Comply with elm-analyse
 - [x] Add game state to model
 - [x] Add info bar and refactor view to smaller functions
+- [x] Refactor hand validation functions
 - [ ] Implement bonus for clearing a stack
 - [ ] Build complete layout with CSSGrid
 - [ ] Improve best hand selection

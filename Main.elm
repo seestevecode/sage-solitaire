@@ -285,7 +285,7 @@ scoreHand cards bonus =
                 ( "5-card Straight", 50 )
             else if fullHouse cards then
                 ( "Full House", 70 )
-            else if flush cards then
+            else if fiveCardFlush cards then
                 ( "Flush", 90 )
             else if fourOfAKind cards then
                 ( "Four of a Kind", 100 )
@@ -625,65 +625,76 @@ validHand sel =
         || threeOfAKind sel
         || fiveCardStraight sel
         || fullHouse sel
-        || flush sel
+        || fiveCardFlush sel
         || fourOfAKind sel
         || straightFlush sel
 
 
-pair : List Card -> Bool
-pair sel =
-    (List.length sel == 2) && (List.length (uniqueRanks sel) == 1)
+handCounts : List Card -> (Card -> a) -> (a -> Int) -> List Int
+handCounts selection component sortfunc =
+    selection
+        |> List.map component
+        |> List.sortBy sortfunc
+        |> ListX.group
+        |> List.map List.length
 
 
-threeOfAKind : List Card -> Bool
-threeOfAKind sel =
-    (List.length sel == 3) && (List.length (uniqueRanks sel) == 1)
+rankCounts : List Card -> List Int
+rankCounts sel =
+    handCounts sel .rank rankToInt
 
 
-fourOfAKind : List Card -> Bool
-fourOfAKind sel =
-    (List.length sel == 4) && (List.length (uniqueRanks sel) == 1)
+suitCounts : List Card -> List Int
+suitCounts sel =
+    handCounts sel .suit suitToInt
 
 
-flush : List Card -> Bool
-flush sel =
-    (List.length sel == 5) && (List.length (uniqueSuits sel) == 1)
-
-
-straight : List Card -> Bool
-straight sel =
+anyStraight : List Card -> Bool
+anyStraight sel =
     sel
         |> List.map .rank
         |> ListX.permutations
         |> List.any (flip ListX.isInfixOf loopedRanks)
 
 
+pair : List Card -> Bool
+pair sel =
+    rankCounts sel == [ 2 ]
+
+
 threeCardStraight : List Card -> Bool
 threeCardStraight sel =
-    (List.length sel == 3) && straight sel
+    List.length sel == 3 && anyStraight sel
+
+
+threeOfAKind : List Card -> Bool
+threeOfAKind sel =
+    rankCounts sel == [ 3 ]
 
 
 fiveCardStraight : List Card -> Bool
 fiveCardStraight sel =
-    (List.length sel == 5) && straight sel
-
-
-straightFlush : List Card -> Bool
-straightFlush sel =
-    fiveCardStraight sel && flush sel
+    List.length sel == 5 && anyStraight sel
 
 
 fullHouse : List Card -> Bool
 fullHouse sel =
-    let
-        listCounts =
-            sel
-                |> List.map .rank
-                |> List.sortBy rankToInt
-                |> ListX.group
-                |> List.map List.length
-    in
-        listCounts == [ 2, 3 ] || listCounts == [ 3, 2 ]
+    rankCounts sel == [ 2, 3 ] || rankCounts sel == [ 3, 2 ]
+
+
+fiveCardFlush : List Card -> Bool
+fiveCardFlush sel =
+    List.length sel == 5 && suitCounts sel == [ 1 ]
+
+
+fourOfAKind : List Card -> Bool
+fourOfAKind sel =
+    rankCounts sel == [ 4 ]
+
+
+straightFlush : List Card -> Bool
+straightFlush sel =
+    fiveCardStraight sel && suitCounts sel == [ 1 ]
 
 
 rankToHtml : Rank -> Html Msg
@@ -793,19 +804,9 @@ bonusStar bonusSuit cardSuit =
             [ bonusHtml ]
 
 
-uniqueRanks : List Card -> List Rank
-uniqueRanks cards =
-    cards |> List.map .rank |> ListX.uniqueBy rankToInt
-
-
 rankToInt : Rank -> Int
 rankToInt rank =
     ListX.elemIndex rank orderedRanks |> Maybe.withDefault 1
-
-
-uniqueSuits : List Card -> List Suit
-uniqueSuits cards =
-    cards |> List.map .suit |> ListX.uniqueBy suitToInt
 
 
 suitToInt : Suit -> Int
