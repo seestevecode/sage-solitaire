@@ -344,36 +344,96 @@ viewPlaying model =
 
         stackView =
             viewStack cardView
+    in
+        Html.div []
+            [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
+            , viewPlayingInfo model
+            , viewPlayingActions model
+            , viewPlayingSidebar model
+            , viewPlayingDebugging model
+            ]
 
+
+viewPlayingInfo : Model -> Html Msg
+viewPlayingInfo model =
+    if validHand model.selected && List.length (uniqueRows model.selected model.board) > 1 then
+        viewPlayingInfoHand model
+    else
+        Html.text ""
+
+
+viewPlayingInfoHand : Model -> Html Msg
+viewPlayingInfoHand model =
+    let
+        hand =
+            scoreHand model.selected model.bonus.suit
+
+        bonusText =
+            if hand.isBonus then
+                " x2"
+            else
+                ""
+    in
+        Html.text <|
+            hand.handName
+                ++ " ("
+                ++ toString hand.baseScore
+                ++ " pts"
+                ++ bonusText
+                ++ ")"
+
+
+viewPlayingActions : Model -> Html Msg
+viewPlayingActions model =
+    if List.length model.selected == 1 && model.trashes > 0 then
+        viewPlayingActionTrash model
+    else if validHand model.selected && List.length (uniqueRows model.selected model.board) > 1 then
+        viewPlayingActionCashIn model
+    else
+        Html.text ""
+
+
+viewPlayingActionTrash : Model -> Html Msg
+viewPlayingActionTrash model =
+    let
+        card =
+            List.head model.selected |> Maybe.withDefault dummyCard
+    in
+        Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
+
+
+viewPlayingActionCashIn : Model -> Html Msg
+viewPlayingActionCashIn model =
+    Html.button [ onClick (SubmitHand model.selected) ] [ Html.text "Cash In" ]
+
+
+viewPlayingSidebar : Model -> Html Msg
+viewPlayingSidebar model =
+    Html.div []
+        [ Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
+        , Html.button [ id "hint", onClick Hint ] [ Html.text "Hint" ]
+        , Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
+        , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+        , Html.p [ id "discarded" ] [ Html.text <| "Discarded: " ++ toString (List.length model.discarded) ]
+        , if List.length model.selected > 0 then
+            Html.button [ onClick Clear ] [ Html.text "Clear" ]
+          else
+            Html.text ""
+        ]
+
+
+viewPlayingDebugging : Model -> Html Msg
+viewPlayingDebugging model =
+    let
         scoredHands =
             scoredHandsFromBoard model.board model.bonus.suit
     in
         Html.div []
-            [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
-            , if ListX.isPermutationOf model.selected (bestHandFromScored scoredHands |> .hand) then
-                Html.text ""
-              else
-                Html.button [ id "hint", onClick Hint ] [ Html.text "Hint" ]
-            , Html.div [ id "actions" ] [ viewActions model.selected model.bonus.suit model.board model.trashes ]
-            , Html.hr [] []
-            , Html.div []
-                [ Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
-                , Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
-                , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
-                , Html.p [ id "discarded" ] [ Html.text <| "Discarded: " ++ toString (List.length model.discarded) ]
-                , if List.length model.selected > 0 then
-                    Html.button [ onClick Clear ] [ Html.text "Clear" ]
-                  else
-                    Html.text ""
-                ]
-            , Html.hr [] []
-            , Html.div []
-                [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
-                , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
-                , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
-                , Html.p [] [ Html.text <| "Game state: " ++ toString model.gameState ]
-                , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
-                ]
+            [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
+            , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
+            , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
+            , Html.p [] [ Html.text <| "Game state: " ++ toString model.gameState ]
+            , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
             ]
 
 
@@ -419,38 +479,6 @@ bestHandFromScored hands =
         longestHighScorers
             |> List.head
             |> Maybe.withDefault (ScoredHand [ dummyCard ] "Dummy" 0 False 0)
-
-
-viewActions : List Card -> Suit -> List (List (List Card)) -> Int -> Html Msg
-viewActions selected bonus board trashes =
-    if List.length selected == 1 && trashes > 0 then
-        let
-            card =
-                List.head selected |> Maybe.withDefault dummyCard
-        in
-            Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
-    else if validHand selected && List.length (uniqueRows selected board) > 1 then
-        let
-            hand =
-                scoreHand selected bonus
-
-            bonusText =
-                if hand.isBonus then
-                    " x2"
-                else
-                    ""
-        in
-            Html.button [ onClick (SubmitHand selected) ]
-                [ hand.handName
-                    ++ " ("
-                    ++ toString hand.baseScore
-                    ++ " pts"
-                    ++ bonusText
-                    ++ ")"
-                    |> Html.text
-                ]
-    else
-        Html.text ""
 
 
 inRow : Card -> Int -> List (List Card) -> Maybe Int

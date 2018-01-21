@@ -33,7 +33,7 @@
 - [x] Add discards to model
 - [x] Comply with elm-analyse
 - [x] Add game state to model
-- [ ] Add info bar
+- [x] Add info bar and refactor view to smaller functions
 - [ ] Implement bonus for clearing a stack
 - [ ] Build complete layout with CSSGrid
 - [ ] Improve best hand selection
