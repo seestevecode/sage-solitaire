@@ -72,6 +72,7 @@ type GameState
     = NewGame
     | Playing
     | GameOver
+    | HandList
 
 
 dummyCard : Card
@@ -92,6 +93,8 @@ type Msg
     | Clear
     | Hint
     | StartGame
+    | ShowHandList
+    | ResumePlaying
 
 
 initModel : Model
@@ -226,7 +229,13 @@ update msg model =
             )
 
         StartGame ->
-            ( updateGameState model, Cmd.none )
+            ( { model | gameState = Playing }, Cmd.none )
+
+        ShowHandList ->
+            ( { model | gameState = HandList }, Cmd.none )
+
+        ResumePlaying ->
+            ( { model | gameState = Playing }, Cmd.none )
 
 
 shuffledCardsGenerator : Generator (List Card)
@@ -237,9 +246,6 @@ shuffledCardsGenerator =
 updateGameState : Model -> Model
 updateGameState model =
     case model.gameState of
-        NewGame ->
-            { model | gameState = Playing }
-
         Playing ->
             { model
                 | gameState =
@@ -249,7 +255,7 @@ updateGameState model =
                         model.gameState
             }
 
-        GameOver ->
+        _ ->
             model
 
 
@@ -325,15 +331,21 @@ view model =
         GameOver ->
             viewGameOver
 
+        HandList ->
+            viewHandList
+
 
 viewNewGame : Html Msg
 viewNewGame =
     Html.button [ onClick StartGame ] [ Html.text "Start new game" ]
 
 
-viewGameOver : Html Msg
-viewGameOver =
-    Html.text "Game over - thanks for playing"
+viewHandList : Html Msg
+viewHandList =
+    Html.div []
+        [ Html.text "Hand list goes here"
+        , Html.button [ onClick ResumePlaying ] [ Html.text "Back to game" ]
+        ]
 
 
 viewPlaying : Model -> Html Msg
@@ -356,10 +368,29 @@ viewPlaying model =
 
 viewPlayingInfo : Model -> Html Msg
 viewPlayingInfo model =
-    if validHand model.selected && List.length (uniqueRows model.selected model.board) > 1 then
+    if
+        validHand model.selected
+            && List.length (uniqueRows model.selected model.board)
+            > 1
+    then
         viewPlayingInfoHand model
+    else if anyStraight model.selected && List.length model.selected == 4 then
+        Html.text "3 or 5 Card Straights only"
+    else if
+        List.length (suitCounts model.selected)
+            == 1
+            && (List.length model.selected == 3 || List.length model.selected == 4)
+    then
+        Html.text "Flushes must be 5 cards"
+    else if rankCounts model.selected == [ 2, 2 ] then
+        Html.text "Two Pair isn't a hand in Sage :("
     else
-        Html.text ""
+        Html.button [ onClick ShowHandList ] [ Html.text "Tap for hand list" ]
+
+
+viewGameOver : Html Msg
+viewGameOver =
+    Html.text "Game over - thanks for playing"
 
 
 viewPlayingInfoHand : Model -> Html Msg
@@ -434,6 +465,8 @@ viewPlayingDebugging model =
             , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
             , Html.p [] [ Html.text <| "Game state: " ++ toString model.gameState ]
             , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
+            , Html.p [] [ Html.text <| "Suits selected: " ++ toString (suitCounts model.selected) ]
+            , Html.p [] [ Html.text <| "Ranks selected: " ++ toString (rankCounts model.selected) ]
             ]
 
 
@@ -684,7 +717,7 @@ fullHouse sel =
 
 fiveCardFlush : List Card -> Bool
 fiveCardFlush sel =
-    List.length sel == 5 && suitCounts sel == [ 1 ]
+    List.length sel == 5 && List.length (suitCounts sel) == 1
 
 
 fourOfAKind : List Card -> Bool
@@ -694,7 +727,7 @@ fourOfAKind sel =
 
 straightFlush : List Card -> Bool
 straightFlush sel =
-    fiveCardStraight sel && suitCounts sel == [ 1 ]
+    fiveCardStraight sel && List.length (suitCounts sel) == 1
 
 
 rankToHtml : Rank -> Html Msg
