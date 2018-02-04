@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (main, clearStackBonuses)
 
 import Html exposing (Html)
 import Html.Attributes exposing (id, class, classList, style)
@@ -153,89 +153,105 @@ orderedRanks =
     loopedRanks |> ListX.init |> Maybe.withDefault [ dummyCard.rank ]
 
 
+clearStackBonuses : List (List Int)
+clearStackBonuses =
+    [ 150, 100, 50 ] |> List.repeat 3 |> ListX.transpose
+
+
 
 -- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        OnShuffle cards ->
-            ( { model
-                | board = boardFromDeck cards
-                , bonus = bonusFromDeck cards
-              }
-            , Cmd.none
-            )
+    let
+        selectedStacks =
+            boardInSelection model.selected model.board
 
-        ToggleCard card ->
-            ( { model
-                | selected =
-                    if List.member card model.selected then
-                        ListX.remove card model.selected
-                    else
-                        card :: model.selected
-              }
-            , Cmd.none
-            )
+        lastCards =
+            lastCardsInBoard model.board
 
-        Trash card ->
-            ( { model
-                | board = removeCardFromBoard card model.board
-                , selected = []
-                , trashes = model.trashes - 1
-                , discarded = card :: model.discarded
-              }
-                |> updateGameState
-            , Cmd.none
-            )
+        clearBonus =
+            bonusScoreFromSelection selectedStacks lastCards clearStackBonuses
+    in
+        case msg of
+            OnShuffle cards ->
+                ( { model
+                    | board = boardFromDeck cards
+                    , bonus = bonusFromDeck cards
+                  }
+                , Cmd.none
+                )
 
-        SubmitHand cards ->
-            ( { model
-                | board = cards |> List.foldl removeCardFromBoard model.board
-                , trashes = min initModel.trashes (model.trashes + 1)
-                , selected = []
-                , score =
-                    let
-                        hand =
-                            scoreHand model.selected model.bonus.suit
-                    in
-                        if hand.isBonus then
-                            model.score + (hand.baseScore * 2)
+            ToggleCard card ->
+                ( { model
+                    | selected =
+                        if List.member card model.selected then
+                            ListX.remove card model.selected
                         else
-                            model.score + hand.baseScore
-                , discarded = cards ++ model.discarded
-              }
-                |> updateGameState
-            , Cmd.none
-            )
+                            card :: model.selected
+                  }
+                , Cmd.none
+                )
 
-        Clear ->
-            ( { model | selected = [] }, Cmd.none )
+            Trash card ->
+                ( { model
+                    | board = removeCardFromBoard card model.board
+                    , selected = []
+                    , trashes = model.trashes - 1
+                    , discarded = card :: model.discarded
+                    , score = model.score + clearBonus
+                  }
+                    |> updateGameState
+                , Cmd.none
+                )
 
-        Hint ->
-            ( { model
-                | selected =
-                    let
-                        scoredHands =
-                            scoredHandsFromBoard model.board model.bonus.suit
-                    in
-                        if List.length scoredHands > 0 then
-                            scoredHands |> bestHandFromScored |> .hand
-                        else
-                            []
-              }
-            , Cmd.none
-            )
+            SubmitHand cards ->
+                ( { model
+                    | board = cards |> List.foldl removeCardFromBoard model.board
+                    , trashes = min initModel.trashes (model.trashes + 1)
+                    , selected = []
+                    , score =
+                        let
+                            hand =
+                                scoreHand model.selected model.bonus.suit
+                        in
+                            if hand.isBonus then
+                                model.score + (hand.baseScore * 2) + clearBonus
+                            else
+                                model.score + hand.baseScore + clearBonus
+                    , discarded = cards ++ model.discarded
+                  }
+                    |> updateGameState
+                , Cmd.none
+                )
 
-        StartGame ->
-            ( { model | gameState = Playing }, Cmd.none )
+            Clear ->
+                ( { model | selected = [] }, Cmd.none )
 
-        ShowHandList ->
-            ( { model | gameState = HandList }, Cmd.none )
+            Hint ->
+                ( { model
+                    | selected =
+                        let
+                            scoredHands =
+                                scoredHandsFromBoard model.board model.bonus.suit
+                        in
+                            if List.length scoredHands > 0 then
+                                scoredHands |> bestHandFromScored |> .hand
+                            else
+                                []
+                  }
+                , Cmd.none
+                )
 
-        ResumePlaying ->
-            ( { model | gameState = Playing }, Cmd.none )
+            StartGame ->
+                ( initModel |> updateGameState, Random.generate OnShuffle shuffledCardsGenerator )
+
+            ShowHandList ->
+                ( { model | gameState = HandList }, Cmd.none )
+
+            ResumePlaying ->
+                ( { model | gameState = Playing }, Cmd.none )
 
 
 shuffledCardsGenerator : Generator (List Card)
@@ -254,6 +270,9 @@ updateGameState model =
                     else
                         model.gameState
             }
+
+        NewGame ->
+            { model | gameState = Playing }
 
         _ ->
             model
@@ -390,7 +409,10 @@ viewPlayingInfo model =
 
 viewGameOver : Html Msg
 viewGameOver =
-    Html.text "Game over - thanks for playing"
+    Html.div []
+        [ Html.div [] [ Html.text "Game over - thanks for playing" ]
+        , viewNewGame
+        ]
 
 
 viewPlayingInfoHand : Model -> Html Msg
@@ -458,6 +480,12 @@ viewPlayingDebugging model =
     let
         scoredHands =
             scoredHandsFromBoard model.board model.bonus.suit
+
+        selectedStacks =
+            boardInSelection model.selected model.board
+
+        lastCards =
+            lastCardsInBoard model.board
     in
         Html.div []
             [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
@@ -467,6 +495,9 @@ viewPlayingDebugging model =
             , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
             , Html.p [] [ Html.text <| "Suits selected: " ++ toString (suitCounts model.selected) ]
             , Html.p [] [ Html.text <| "Ranks selected: " ++ toString (rankCounts model.selected) ]
+            , Html.p [] [ Html.text <| "Last cards: " ++ toString (lastCardsInBoard model.board) ]
+            , Html.p [] [ Html.text <| "Selected: " ++ toString (boardInSelection model.selected model.board) ]
+            , Html.p [] [ Html.text <| "Bonus: " ++ toString (bonusScoreFromSelection selectedStacks lastCards clearStackBonuses) ]
             ]
 
 
@@ -634,6 +665,65 @@ viewCard selected board bonus card =
             , suitToHtml card.suit
             , bonusStar bonus card.suit
             ]
+
+
+stackInSelection : List Card -> List Card -> Bool
+stackInSelection selection cards =
+    let
+        topCard =
+            List.head cards |> Maybe.withDefault dummyCard
+    in
+        List.member topCard selection
+
+
+rowInSelection : List Card -> List (List Card) -> List Bool
+rowInSelection selection row =
+    row |> List.map (stackInSelection selection)
+
+
+boardInSelection : List Card -> List (List (List Card)) -> List (List Bool)
+boardInSelection selection board =
+    board |> List.map (rowInSelection selection)
+
+
+bonusScoreFromSelection : List (List Bool) -> List (List Bool) -> List (List Int) -> Int
+bonusScoreFromSelection selected lastCard bonus =
+    let
+        selections =
+            List.concat selected
+
+        lastCards =
+            List.concat lastCard
+
+        bonuses =
+            List.concat bonus
+    in
+        List.map3
+            (\sel lc bon ->
+                if sel && lc then
+                    bon
+                else
+                    0
+            )
+            selections
+            lastCards
+            bonuses
+            |> List.sum
+
+
+lastCardInStack : List Card -> Bool
+lastCardInStack cards =
+    List.length cards == 1
+
+
+lastCardsInRow : List (List Card) -> List Bool
+lastCardsInRow row =
+    List.map lastCardInStack row
+
+
+lastCardsInBoard : List (List (List Card)) -> List (List Bool)
+lastCardsInBoard board =
+    List.map lastCardsInRow board
 
 
 removeCardFromStack : Card -> List Card -> List Card

@@ -35,8 +35,8 @@
 - [x] Add game state to model
 - [x] Add info bar and refactor view to smaller functions
 - [x] Refactor hand validation functions
+- [x] Implement bonus for clearing a stack
 - [ ] Change buttons to anchors
-- [ ] Implement bonus for clearing a stack
 - [ ] Build complete layout with CSSGrid
 - [ ] Improve best hand selection
 - [ ] Fix offset of card with no others in stack
