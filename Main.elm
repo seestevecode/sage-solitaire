@@ -1,4 +1,4 @@
-module Main exposing (main, clearStackBonuses)
+module Main exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes exposing (id, class, classList, style)
@@ -7,6 +7,10 @@ import List.Extra as ListX
 import Random exposing (Generator)
 import Random.List
 import Maybe.Extra as MaybeX
+import Element
+import Element.Input as Input
+import Element.Background as Background
+import Color
 
 
 main : Program Never Model Msg
@@ -356,7 +360,12 @@ view model =
 
 viewNewGame : Html Msg
 viewNewGame =
-    Html.button [ onClick StartGame ] [ Html.text "Start new game" ]
+    Element.layout
+        [ Background.color Color.darkGreen ]
+    <|
+        Input.button
+            []
+            { onPress = Just StartGame, label = Element.text "Start new game" }
 
 
 viewHandList : Html Msg
