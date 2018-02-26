@@ -370,10 +370,13 @@ viewNewGame =
 
 viewHandList : Html Msg
 viewHandList =
-    Html.div []
-        [ Html.text "Hand list goes here"
-        , Html.button [ onClick ResumePlaying ] [ Html.text "Back to game" ]
-        ]
+    Element.layout
+        [ Background.color Color.darkGreen ]
+    <|
+        Element.column []
+            [ Element.el [] <| Element.text "Hand list goes here"
+            , Input.button [] { onPress = Just ResumePlaying, label = Element.text "Back to game" }
+            ]
 
 
 viewPlaying : Model -> Html Msg
