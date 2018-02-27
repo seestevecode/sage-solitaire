@@ -10,6 +10,9 @@ import Maybe.Extra as MaybeX
 import Element
 import Element.Input as Input
 import Element.Background as Background
+import Element.Font as Font
+import Element.Events as Events
+import Element.Border as Border
 import Color
 
 
@@ -379,6 +382,24 @@ viewHandList =
             ]
 
 
+
+-- viewPlaying : Model -> Html Msg
+-- viewPlaying model =
+--     let
+--         cardView =
+--             viewCard model.selected model.board model.bonus.suit
+--         stackView =
+--             viewStack cardView
+--     in
+--         Html.div []
+--             [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
+--             , viewPlayingInfo model
+--             , viewPlayingActions model
+--             , viewPlayingSidebar model
+--             , viewPlayingDebugging model
+--             ]
+
+
 viewPlaying : Model -> Html Msg
 viewPlaying model =
     let
@@ -388,16 +409,18 @@ viewPlaying model =
         stackView =
             viewStack cardView
     in
-        Html.div []
-            [ Html.div [ id "board" ] [ viewBoard stackView model.board ]
-            , viewPlayingInfo model
-            , viewPlayingActions model
-            , viewPlayingSidebar model
-            , viewPlayingDebugging model
-            ]
+        Element.layout [] <|
+            Element.row []
+                [ Element.column []
+                    [ viewPlayingInfo model
+                    , viewBoard stackView model.board
+                    , viewPlayingActions model
+                    ]
+                , viewPlayingSidebar model
+                ]
 
 
-viewPlayingInfo : Model -> Html Msg
+viewPlayingInfo : Model -> Element.Element Msg
 viewPlayingInfo model =
     if
         validHand model.selected
@@ -406,17 +429,17 @@ viewPlayingInfo model =
     then
         viewPlayingInfoHand model
     else if anyStraight model.selected && List.length model.selected == 4 then
-        Html.text "3 or 5 Card Straights only"
+        Element.text "3 or 5 Card Straights only"
     else if
         List.length (suitCounts model.selected)
             == 1
             && (List.length model.selected == 3 || List.length model.selected == 4)
     then
-        Html.text "Flushes must be 5 cards"
+        Element.text "Flushes must be 5 cards"
     else if rankCounts model.selected == [ 2, 2 ] then
-        Html.text "Two Pair isn't a hand in Sage :("
+        Element.text "Two Pair isn't a hand in Sage :("
     else
-        Html.button [ onClick ShowHandList ] [ Html.text "Tap for hand list" ]
+        Input.button [] { onPress = Just ShowHandList, label = Element.text "Show Hand List" }
 
 
 viewGameOver : Html Msg
@@ -427,7 +450,7 @@ viewGameOver =
         ]
 
 
-viewPlayingInfoHand : Model -> Html Msg
+viewPlayingInfoHand : Model -> Element.Element Msg
 viewPlayingInfoHand model =
     let
         hand =
@@ -439,7 +462,7 @@ viewPlayingInfoHand model =
             else
                 ""
     in
-        Html.text <|
+        Element.text <|
             hand.handName
                 ++ " ("
                 ++ toString hand.baseScore
@@ -448,42 +471,58 @@ viewPlayingInfoHand model =
                 ++ ")"
 
 
-viewPlayingActions : Model -> Html Msg
+viewPlayingActions : Model -> Element.Element Msg
 viewPlayingActions model =
     if List.length model.selected == 1 && model.trashes > 0 then
         viewPlayingActionTrash model
     else if validHand model.selected && List.length (uniqueRows model.selected model.board) > 1 then
         viewPlayingActionCashIn model
     else
-        Html.text ""
+        Element.empty
 
 
-viewPlayingActionTrash : Model -> Html Msg
+viewPlayingActionTrash : Model -> Element.Element Msg
 viewPlayingActionTrash model =
     let
         card =
             List.head model.selected |> Maybe.withDefault dummyCard
     in
-        Html.button [ onClick (Trash card) ] [ Html.text "Trash" ]
+        Input.button [] { onPress = Just (Trash card), label = Element.text "Trash" }
 
 
-viewPlayingActionCashIn : Model -> Html Msg
+viewPlayingActionCashIn : Model -> Element.Element Msg
 viewPlayingActionCashIn model =
-    Html.button [ onClick (SubmitHand model.selected) ] [ Html.text "Cash In" ]
+    Input.button [] { onPress = Just (SubmitHand model.selected), label = Element.text "Cash In" }
 
 
-viewPlayingSidebar : Model -> Html Msg
+
+-- viewPlayingSidebar : Model -> Html Msg
+-- viewPlayingSidebar model =
+--     Html.div []
+--         [ Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
+--         , Html.button [ id "hint", onClick Hint ] [ Html.text "Hint" ]
+--         , Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
+--         , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
+--         , Html.p [ id "discarded" ] [ Html.text <| "Discarded: " ++ toString (List.length model.discarded) ]
+--         , if List.length model.selected > 0 then
+--             Html.button [ onClick Clear ] [ Html.text "Clear" ]
+--           else
+--             Html.text ""
+--         ]
+
+
+viewPlayingSidebar : Model -> Element.Element Msg
 viewPlayingSidebar model =
-    Html.div []
-        [ Html.p [ id "score" ] [ Html.text <| "Score: " ++ toString model.score ]
-        , Html.button [ id "hint", onClick Hint ] [ Html.text "Hint" ]
-        , Html.div [ id "bonus" ] [ Html.text <| "Bonus: " ++ toString model.bonus ]
-        , Html.p [ id "trashes" ] [ Html.text <| "Trashes: " ++ toString model.trashes ]
-        , Html.p [ id "discarded" ] [ Html.text <| "Discarded: " ++ toString (List.length model.discarded) ]
+    Element.column []
+        [ Element.el [] <| Element.text <| "Score: " ++ toString model.score
+        , Input.button [] { onPress = Just Hint, label = Element.text "Hint" }
+        , Element.el [] <| Element.text <| "Bonus: " ++ toString model.bonus
+        , Element.el [] <| Element.text <| "Trashes: " ++ toString model.trashes
+        , Element.el [] <| Element.text <| "Discarded: " ++ toString (List.length model.discarded)
         , if List.length model.selected > 0 then
-            Html.button [ onClick Clear ] [ Html.text "Clear" ]
+            Input.button [] { onPress = Just Clear, label = Element.text "Clear" }
           else
-            Html.text ""
+            Element.empty
         ]
 
 
@@ -579,104 +618,80 @@ uniqueRows searches grid =
         |> ListX.unique
 
 
-viewBoard : (List Card -> Html Msg) -> List (List (List Card)) -> Html Msg
+viewBoard : (List Card -> Element.Element Msg) -> List (List (List Card)) -> Element.Element Msg
 viewBoard stackView board =
     let
-        viewRow : Int -> Html Msg
+        viewRow : Int -> Element.Element Msg
         viewRow y =
             ListX.getAt y board
                 |> Maybe.withDefault dummyRow
                 |> List.map stackView
-                |> Html.div []
+                |> Element.row []
     in
         List.range 0 (List.length board - 1)
             |> List.map viewRow
-            |> Html.div []
+            |> Element.column []
 
 
-viewStack : (Card -> Html Msg) -> List Card -> Html Msg
+viewStack : (Card -> Element.Element Msg) -> List Card -> Element.Element Msg
 viewStack cardView cards =
     let
         stackAtts =
-            [ class "stack"
-            , style
-                [ ( "display", "table-cell" )
-                , ( "width", "100px" )
-                , ( "height", "100px" )
-                , ( "border", "1px solid #0c4" )
-                , ( "background-color", "#093" )
-                , ( "padding", "15px 25px" )
-                ]
+            [ Element.width <| Element.px 150
+            , Element.height <| Element.px 150
+            , Border.solid
+            , Border.width 1
+            , Border.color <| Color.rgb 0 204 68
+            , Background.color <| Color.rgb 0 153 51
+            , Element.paddingXY 15 25
             ]
     in
         case List.head cards of
-            Just card ->
-                Html.div stackAtts
-                    [ cardView card
-                    , Html.text "🂠"
-                        |> List.repeat (List.length cards - 1)
-                        |> Html.div
-                            [ class "stack-size"
-                            , style
-                                [ ( "margin", "auto" )
-                                , ( "padding-top", "10px" )
-                                , ( "color", "white" )
-                                , ( "text-align", "center" )
-                                ]
-                            ]
-                    ]
-
             Nothing ->
-                Html.div stackAtts [ Html.text "" ]
+                Element.el stackAtts Element.empty
+
+            Just card ->
+                let
+                    cardString =
+                        String.concat <| List.repeat (List.length cards - 1) "🂠"
+                in
+                    Element.el stackAtts <|
+                        Element.column []
+                            [ cardView card
+                            , Element.el [] <| Element.text cardString
+                            ]
 
 
-viewCard : List Card -> List (List (List Card)) -> Suit -> Card -> Html Msg
+viewCard : List Card -> List (List (List Card)) -> Suit -> Card -> Element.Element Msg
 viewCard selected board bonus card =
     let
         selectionColor =
             if validHand selected && List.length (uniqueRows selected board) > 1 then
-                "gold"
+                Color.yellow
             else
-                "red"
-
-        selectionStyle =
-            ( "box-shadow"
-            , "3px 3px 1px "
-                ++ selectionColor
-                ++ ", -3px -3px 1px "
-                ++ selectionColor
-                ++ ", 3px -3px 1px "
-                ++ selectionColor
-                ++ ", -3px 3px 1px "
-                ++ selectionColor
-            )
-
-        defaultCardStyles =
-            [ ( "width", "50px" )
-            , ( "height", "70px" )
-            , ( "background-color", "white" )
-            , ( "margin", "auto" )
-            , ( "border", "1px solid #999" )
-            , ( "border-radius", "5px" )
-            , ( "position", "relative" )
-            , ( "cursor", "pointer" )
-            ]
-
-        cardStyles =
-            if List.member card selected then
-                selectionStyle :: defaultCardStyles
-            else
-                defaultCardStyles
+                Color.red
     in
-        Html.div
-            [ class "card"
-            , style cardStyles
-            , onClick (ToggleCard card)
+        Element.row
+            [ Events.onClick (ToggleCard card)
+            , Element.width <| Element.px 50
+            , Element.height <| Element.px 70
+            , Background.color Color.white
+            , Border.rounded 5
+            , Border.width 1
+            , Border.solid
+            , Border.color Color.grey
+            , if List.member card selected then
+                Border.glow selectionColor 3
+              else
+                Border.glow Color.white 0
             ]
-            [ rankToHtml card.rank
-            , suitToHtml card.suit
-            , bonusStar bonus card.suit
+            [ viewRank card.rank
+            , viewSuit card.suit
+            , viewBonusStar bonus card.suit
             ]
+
+
+
 
 
 stackInSelection : List Card -> List Card -> Bool
@@ -832,8 +847,8 @@ straightFlush sel =
     fiveCardStraight sel && List.length (suitCounts sel) == 1
 
 
-rankToHtml : Rank -> Html Msg
-rankToHtml rank =
+viewRank : Rank -> Element.Element Msg
+viewRank rank =
     let
         r =
             case rank of
@@ -867,76 +882,38 @@ rankToHtml rank =
                 _ ->
                     String.left 1 <| toString rank
     in
-        Html.div
-            [ classList
-                [ ( "rank", True )
-                , ( String.toLower <| toString rank, True )
-                ]
-            , style
-                [ ( "font", "35px Arial,sans-serif" )
-                , ( "font-weight", "bold" )
-                , ( "position", "absolute" )
-                , ( "bottom", "0" )
-                , ( "right", "5px" )
-                ]
-            ]
-            [ Html.text r ]
+        Element.el [ Font.size 35, Font.bold ] <| Element.text r
 
 
-suitToHtml : Suit -> Html Msg
-suitToHtml suit =
+viewSuit : Suit -> Element.Element Msg
+viewSuit suit =
     let
         ( symbol, colour ) =
             case suit of
                 Hearts ->
-                    ( "♥", "red" )
+                    ( "♥", Color.red )
 
                 Clubs ->
-                    ( "♣", "black" )
+                    ( "♣", Color.black )
 
                 Diamonds ->
-                    ( "♦", "red" )
+                    ( "♦", Color.red )
 
                 Spades ->
-                    ( "♠", "black" )
+                    ( "♠", Color.black )
     in
-        Html.div
-            [ classList
-                [ ( "suit", True )
-                , ( String.toLower <| toString suit, True )
-                ]
-            , style
-                [ ( "color", colour )
-                , ( "position", "absolute" )
-                , ( "top", "0" )
-                , ( "left", "5px" )
-                , ( "font-size", "30px" )
-                ]
-            ]
-            [ Html.text symbol ]
+        Element.el [ Font.color colour, Font.size 30 ] <| Element.text symbol
 
 
-bonusStar : Suit -> Suit -> Html Msg
-bonusStar bonusSuit cardSuit =
-    let
-        bonusHtml =
-            if cardSuit == bonusSuit then
-                Html.span
-                    [ class "star"
-                    , style
-                        [ ( "position", "absolute" )
-                        , ( "top", "2px" )
-                        , ( "right", "5px" )
-                        , ( "color", "orange" )
-                        ]
-                    ]
-                    [ Html.text "★" ]
-            else
-                Html.text ""
-    in
-        Html.div
-            [ class "bonus" ]
-            [ bonusHtml ]
+viewBonusStar : Suit -> Suit -> Element.Element Msg
+viewBonusStar bonusSuit cardSuit =
+    if cardSuit == bonusSuit then
+        Element.el
+            [ Font.color Color.orange ]
+        <|
+            Element.text "★"
+    else
+        Element.empty
 
 
 rankToInt : Rank -> Int
