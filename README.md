@@ -2,6 +2,8 @@
 
 Based on Sage Solitaire, by Zach Gage
 
+[Play the game](https://seestevecode.github.io/elm-sage-solitaire/elm-sage-solitaire.html)
+
 ## Rules
 
 In Sage Solitaire, your goal is to clear all the cards.
