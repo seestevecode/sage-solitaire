@@ -1,9 +1,5 @@
 # Elm Sage Solitaire
 
-## Hat-tips to:
-
-- https://www.youtube.com/watch?v=dDZb46sN3yM
-
 
 ## TODO:
 
@@ -36,10 +32,9 @@
 - [x] Add info bar and refactor view to smaller functions
 - [x] Refactor hand validation functions
 - [x] Implement bonus for clearing a stack
-- [ ] Change buttons to anchors
-- [ ] Build complete layout with CSSGrid
+- [x] Build complete layout with Stylish Elephants
+- [x] Fix offset of card with no others in stack
 - [ ] Improve best hand selection
-- [ ] Fix offset of card with no others in stack
 - [ ] Add keyboard controls
 - [ ] Separate into smaller modules
-- [ ] Separate CSS from Elm
+- [ ] Add in-game tutorial

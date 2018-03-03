@@ -389,10 +389,10 @@ viewHandList : Element.Element Msg
 viewHandList =
     Element.column []
         [ Element.el [ Element.centerX, Element.centerY ] <|
-            Element.column [Element.width Element.fill] <|
+            Element.column [ Element.width Element.fill ] <|
                 List.map
-                viewHandListEntry
-                handListEntries
+                    viewHandListEntry
+                    handListEntries
         , Input.button viewWhiteBarAtts
             { onPress = Just ResumePlaying, label = Element.text "Back to game" }
         ]
@@ -559,32 +559,6 @@ viewPlayingSidebar model =
             )
             { onPress = Just Clear, label = Element.text "Clear" }
         ]
-
-
-viewPlayingDebugging : Model -> Html Msg
-viewPlayingDebugging model =
-    let
-        scoredHands =
-            scoredHandsFromBoard model.board model.bonus.suit
-
-        selectedStacks =
-            boardInSelection model.selected model.board
-
-        lastCards =
-            lastCardsInBoard model.board
-    in
-        Html.div []
-            [ Html.p [] [ Html.text <| "Possible scores: " ++ toString (List.map .actualScore scoredHands) ]
-            , Html.p [] [ Html.text <| "Best score: " ++ toString (.actualScore <| bestHandFromScored scoredHands) ]
-            , Html.p [] [ Html.text <| "Discarded: " ++ toString model.discarded ]
-            , Html.p [] [ Html.text <| "Game state: " ++ toString model.gameState ]
-            , Html.p [] [ Html.text <| "No more moves: " ++ toString (noMoreMoves model) ]
-            , Html.p [] [ Html.text <| "Suits selected: " ++ toString (suitCounts model.selected) ]
-            , Html.p [] [ Html.text <| "Ranks selected: " ++ toString (rankCounts model.selected) ]
-            , Html.p [] [ Html.text <| "Last cards: " ++ toString (lastCardsInBoard model.board) ]
-            , Html.p [] [ Html.text <| "Selected: " ++ toString (boardInSelection model.selected model.board) ]
-            , Html.p [] [ Html.text <| "Bonus: " ++ toString (bonusScoreFromSelection selectedStacks lastCards clearStackBonuses) ]
-            ]
 
 
 scoredHandsFromBoard : Board -> Suit -> List ScoredHand
