@@ -23500,25 +23500,12 @@ var _user$project$Main$viewStack = F2(
 					_mdgriffith$stylish_elephants$Element$px(150)),
 				_1: {
 					ctor: '::',
-					_0: _mdgriffith$stylish_elephants$Element_Border$solid,
+					_0: _mdgriffith$stylish_elephants$Element_Background$color(
+						A3(_elm_lang$core$Color$rgb, 0, 153, 51)),
 					_1: {
 						ctor: '::',
-						_0: _mdgriffith$stylish_elephants$Element_Border$width(1),
-						_1: {
-							ctor: '::',
-							_0: _mdgriffith$stylish_elephants$Element_Border$color(
-								A3(_elm_lang$core$Color$rgb, 0, 204, 68)),
-							_1: {
-								ctor: '::',
-								_0: _mdgriffith$stylish_elephants$Element_Background$color(
-									A3(_elm_lang$core$Color$rgb, 0, 153, 51)),
-								_1: {
-									ctor: '::',
-									_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 15, 25),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
+						_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 15, 25),
+						_1: {ctor: '[]'}
 					}
 				}
 			}
@@ -23585,6 +23572,35 @@ var _user$project$Main$uniqueRows = F2(
 				_user$project$Main$inRowAll(grid),
 				searches));
 	});
+var _user$project$Main$viewWhiteBarAtts = {
+	ctor: '::',
+	_0: _mdgriffith$stylish_elephants$Element$centerX,
+	_1: {
+		ctor: '::',
+		_0: _mdgriffith$stylish_elephants$Element$width(_mdgriffith$stylish_elephants$Element$fill),
+		_1: {
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$white),
+			_1: {
+				ctor: '::',
+				_0: A2(_mdgriffith$stylish_elephants$Element_Border$widthXY, 0, 1),
+				_1: {
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element_Border$solid,
+					_1: {
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$lightGrey),
+						_1: {
+							ctor: '::',
+							_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 0, 10),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	}
+};
 var _user$project$Main$clearStackBonuses = _elm_community$list_extra$List_Extra$transpose(
 	A2(
 		_elm_lang$core$List$repeat,
@@ -23730,7 +23746,7 @@ var _user$project$Main$viewBoard = F2(
 				_mdgriffith$stylish_elephants$Element$row,
 				{
 					ctor: '::',
-					_0: _mdgriffith$stylish_elephants$Element$spacing(5),
+					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 20, 0),
 					_1: {ctor: '[]'}
 				},
 				A2(
@@ -23743,11 +23759,7 @@ var _user$project$Main$viewBoard = F2(
 		};
 		return A2(
 			_mdgriffith$stylish_elephants$Element$column,
-			{
-				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element$spacing(5),
-				_1: {ctor: '[]'}
-			},
+			{ctor: '[]'},
 			A2(
 				_elm_lang$core$List$map,
 				viewRow,
@@ -24267,36 +24279,37 @@ var _user$project$Main$initModel = {
 };
 var _user$project$Main$ResumePlaying = {ctor: 'ResumePlaying'};
 var _user$project$Main$viewHandList = A2(
-	_mdgriffith$stylish_elephants$Element$layout,
+	_mdgriffith$stylish_elephants$Element$column,
+	{ctor: '[]'},
 	{
 		ctor: '::',
-		_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$darkGreen),
-		_1: {ctor: '[]'}
-	},
-	A2(
-		_mdgriffith$stylish_elephants$Element$column,
-		{ctor: '[]'},
-		{
+		_0: A2(
+			_mdgriffith$stylish_elephants$Element$el,
+			{
+				ctor: '::',
+				_0: _mdgriffith$stylish_elephants$Element$centerX,
+				_1: {
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerY,
+					_1: {ctor: '[]'}
+				}
+			},
+			_mdgriffith$stylish_elephants$Element$text('Hand list goes here')),
+		_1: {
 			ctor: '::',
 			_0: A2(
-				_mdgriffith$stylish_elephants$Element$el,
-				{ctor: '[]'},
-				_mdgriffith$stylish_elephants$Element$text('Hand list goes here')),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_mdgriffith$stylish_elephants$Element_Input$button,
-					{ctor: '[]'},
-					{
-						onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ResumePlaying),
-						label: _mdgriffith$stylish_elephants$Element$text('Back to game')
-					}),
-				_1: {ctor: '[]'}
-			}
-		}));
+				_mdgriffith$stylish_elephants$Element_Input$button,
+				_user$project$Main$viewWhiteBarAtts,
+				{
+					onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ResumePlaying),
+					label: _mdgriffith$stylish_elephants$Element$text('Back to game')
+				}),
+			_1: {ctor: '[]'}
+		}
+	});
 var _user$project$Main$ShowHandList = {ctor: 'ShowHandList'};
 var _user$project$Main$viewPlayingInfo = function (model) {
-	return (_user$project$Main$validHand(model.selected) && (_elm_lang$core$Native_Utils.cmp(
+	var content = (_user$project$Main$validHand(model.selected) && (_elm_lang$core$Native_Utils.cmp(
 		_elm_lang$core$List$length(
 			A2(_user$project$Main$uniqueRows, model.selected, model.board)),
 		1) > 0)) ? _user$project$Main$viewPlayingInfoHand(model) : ((_user$project$Main$anyStraight(model.selected) && _elm_lang$core$Native_Utils.eq(
@@ -24325,53 +24338,47 @@ var _user$project$Main$viewPlayingInfo = function (model) {
 			onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ShowHandList),
 			label: _mdgriffith$stylish_elephants$Element$text('Show Hand List')
 		}))));
+	return A2(_mdgriffith$stylish_elephants$Element$el, _user$project$Main$viewWhiteBarAtts, content);
 };
 var _user$project$Main$StartGame = {ctor: 'StartGame'};
 var _user$project$Main$viewNewGameButton = A2(
 	_mdgriffith$stylish_elephants$Element_Input$button,
-	{
-		ctor: '::',
-		_0: _mdgriffith$stylish_elephants$Element$centerX,
-		_1: {ctor: '[]'}
-	},
+	_user$project$Main$viewWhiteBarAtts,
 	{
 		onPress: _elm_lang$core$Maybe$Just(_user$project$Main$StartGame),
 		label: _mdgriffith$stylish_elephants$Element$text('Start new game')
 	});
-var _user$project$Main$viewNewGame = A2(
-	_mdgriffith$stylish_elephants$Element$layout,
-	{
-		ctor: '::',
-		_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$darkGreen),
-		_1: {ctor: '[]'}
-	},
-	_user$project$Main$viewNewGameButton);
 var _user$project$Main$viewGameOver = function (model) {
 	return A2(
-		_mdgriffith$stylish_elephants$Element$layout,
+		_mdgriffith$stylish_elephants$Element$column,
 		{ctor: '[]'},
-		A2(
-			_mdgriffith$stylish_elephants$Element$column,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_mdgriffith$stylish_elephants$Element$el,
-					{ctor: '[]'},
-					_mdgriffith$stylish_elephants$Element$text(
+		{
+			ctor: '::',
+			_0: A2(
+				_mdgriffith$stylish_elephants$Element$el,
+				{
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerX,
+					_1: {
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$centerY,
+						_1: {ctor: '[]'}
+					}
+				},
+				_mdgriffith$stylish_elephants$Element$text(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'Game over - you scored ',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							'Game over - you scored ',
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Basics$toString(model.score),
-								'. Thanks for playing.')))),
-				_1: {
-					ctor: '::',
-					_0: _user$project$Main$viewNewGameButton,
-					_1: {ctor: '[]'}
-				}
-			}));
+							_elm_lang$core$Basics$toString(model.score),
+							'. Thanks for playing.')))),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Main$viewNewGameButton,
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _user$project$Main$Hint = {ctor: 'Hint'};
 var _user$project$Main$Clear = {ctor: 'Clear'};
@@ -24381,7 +24388,7 @@ var _user$project$Main$SubmitHand = function (a) {
 var _user$project$Main$viewPlayingActionCashIn = function (model) {
 	return A2(
 		_mdgriffith$stylish_elephants$Element_Input$button,
-		{ctor: '[]'},
+		_user$project$Main$viewWhiteBarAtts,
 		{
 			onPress: _elm_lang$core$Maybe$Just(
 				_user$project$Main$SubmitHand(model.selected)),
@@ -24398,7 +24405,7 @@ var _user$project$Main$viewPlayingActionTrash = function (model) {
 		_elm_lang$core$List$head(model.selected));
 	return A2(
 		_mdgriffith$stylish_elephants$Element_Input$button,
-		{ctor: '[]'},
+		_user$project$Main$viewWhiteBarAtts,
 		{
 			onPress: _elm_lang$core$Maybe$Just(
 				_user$project$Main$Trash(card)),
@@ -24468,13 +24475,13 @@ var _user$project$Main$viewCard = F4(
 															_0: _mdgriffith$stylish_elephants$Element_Border$rounded(6),
 															_1: {
 																ctor: '::',
-																_0: _mdgriffith$stylish_elephants$Element_Border$width(2),
+																_0: _mdgriffith$stylish_elephants$Element_Border$width(1),
 																_1: {
 																	ctor: '::',
 																	_0: _mdgriffith$stylish_elephants$Element_Border$solid,
 																	_1: {
 																		ctor: '::',
-																		_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$grey),
+																		_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$darkGrey),
 																		_1: {
 																			ctor: '::',
 																			_0: A2(_elm_lang$core$List$member, card, selected) ? A2(_mdgriffith$stylish_elephants$Element_Border$glow, selectionColor, 3) : A2(_mdgriffith$stylish_elephants$Element_Border$glow, _elm_lang$core$Color$white, 0),
@@ -24513,7 +24520,11 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 			ctor: '::',
 			_0: A2(
 				_mdgriffith$stylish_elephants$Element$el,
-				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerX,
+					_1: {ctor: '[]'}
+				},
 				_mdgriffith$stylish_elephants$Element$text(
 					A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -24523,7 +24534,11 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 				ctor: '::',
 				_0: A2(
 					_mdgriffith$stylish_elephants$Element_Input$button,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$centerX,
+						_1: {ctor: '[]'}
+					},
 					{
 						onPress: _elm_lang$core$Maybe$Just(_user$project$Main$Hint),
 						label: _mdgriffith$stylish_elephants$Element$text('Hint')
@@ -24535,7 +24550,11 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 						ctor: '::',
 						_0: A2(
 							_mdgriffith$stylish_elephants$Element$el,
-							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _mdgriffith$stylish_elephants$Element$centerX,
+								_1: {ctor: '[]'}
+							},
 							_mdgriffith$stylish_elephants$Element$text(
 								A2(
 									_elm_lang$core$Basics_ops['++'],
@@ -24544,8 +24563,8 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 						_1: {
 							ctor: '::',
 							_0: function () {
-								var percentComplete = _elm_lang$core$Basics$toFloat(
-									_elm_lang$core$List$length(model.discarded)) / 52.0;
+								var percentComplete = (100 * _elm_lang$core$Basics$toFloat(
+									_elm_lang$core$List$length(model.discarded))) / 52.0;
 								return A2(
 									_mdgriffith$stylish_elephants$Element$el,
 									{ctor: '[]'},
@@ -24553,7 +24572,11 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 										A2(
 											_elm_lang$core$Basics_ops['++'],
 											'Completed: ',
-											_elm_lang$core$Basics$toString(percentComplete))));
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(
+													_elm_lang$core$Basics$round(percentComplete)),
+												'%'))));
 							}(),
 							_1: {
 								ctor: '::',
@@ -24578,13 +24601,66 @@ var _user$project$Main$viewPlaying = function (model) {
 	var cardView = A3(_user$project$Main$viewCard, model.selected, model.board, model.bonus.suit);
 	var stackView = _user$project$Main$viewStack(cardView);
 	return A2(
+		_mdgriffith$stylish_elephants$Element$row,
+		{
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element$height(
+				_mdgriffith$stylish_elephants$Element$px(600)),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_mdgriffith$stylish_elephants$Element$el,
+				{
+					ctor: '::',
+					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 0, 20),
+					_1: {
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$above(
+							_user$project$Main$viewPlayingInfo(model)),
+						_1: {
+							ctor: '::',
+							_0: _mdgriffith$stylish_elephants$Element$below(
+								_user$project$Main$viewPlayingActions(model)),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				A2(_user$project$Main$viewBoard, stackView, model.board)),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Main$viewPlayingSidebar(model),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Main$view = function (model) {
+	var layout = function () {
+		var _p8 = model.gameState;
+		switch (_p8.ctor) {
+			case 'NewGame':
+				return _user$project$Main$viewNewGameButton;
+			case 'Playing':
+				return _user$project$Main$viewPlaying(model);
+			case 'GameOver':
+				return _user$project$Main$viewGameOver(model);
+			default:
+				return _user$project$Main$viewHandList;
+		}
+	}();
+	return A2(
 		_mdgriffith$stylish_elephants$Element$layout,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$grey),
+			_1: {ctor: '[]'}
+		},
 		A2(
-			_mdgriffith$stylish_elephants$Element$row,
+			_mdgriffith$stylish_elephants$Element$el,
 			{
 				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element$centerY,
+				_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$darkGreen),
 				_1: {
 					ctor: '::',
 					_0: _mdgriffith$stylish_elephants$Element$height(
@@ -24595,57 +24671,17 @@ var _user$project$Main$viewPlaying = function (model) {
 							_mdgriffith$stylish_elephants$Element$px(600)),
 						_1: {
 							ctor: '::',
-							_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$darkGreen),
-							_1: {ctor: '[]'}
+							_0: _mdgriffith$stylish_elephants$Element$centerX,
+							_1: {
+								ctor: '::',
+								_0: _mdgriffith$stylish_elephants$Element$centerY,
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
 			},
-			{
-				ctor: '::',
-				_0: A2(
-					_mdgriffith$stylish_elephants$Element$column,
-					{
-						ctor: '::',
-						_0: _mdgriffith$stylish_elephants$Element$spacing(20),
-						_1: {
-							ctor: '::',
-							_0: _mdgriffith$stylish_elephants$Element$padding(50),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: _user$project$Main$viewPlayingInfo(model),
-						_1: {
-							ctor: '::',
-							_0: A2(_user$project$Main$viewBoard, stackView, model.board),
-							_1: {
-								ctor: '::',
-								_0: _user$project$Main$viewPlayingActions(model),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _user$project$Main$viewPlayingSidebar(model),
-					_1: {ctor: '[]'}
-				}
-			}));
-};
-var _user$project$Main$view = function (model) {
-	var _p8 = model.gameState;
-	switch (_p8.ctor) {
-		case 'NewGame':
-			return _user$project$Main$viewNewGame;
-		case 'Playing':
-			return _user$project$Main$viewPlaying(model);
-		case 'GameOver':
-			return _user$project$Main$viewGameOver(model);
-		default:
-			return _user$project$Main$viewHandList;
-	}
+			layout));
 };
 var _user$project$Main$OnShuffle = function (a) {
 	return {ctor: 'OnShuffle', _0: a};

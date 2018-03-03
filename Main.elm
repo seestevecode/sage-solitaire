@@ -254,7 +254,10 @@ update msg model =
                 )
 
             StartGame ->
-                ( initModel |> updateGameState, Random.generate OnShuffle shuffledCardsGenerator )
+                ( initModel
+                    |> updateGameState
+                , Random.generate OnShuffle shuffledCardsGenerator
+                )
 
             ShowHandList ->
                 ( { model | gameState = HandList }, Cmd.none )
@@ -349,106 +352,133 @@ scoreHand cards bonus =
 
 view : Model -> Html Msg
 view model =
-    case model.gameState of
-        NewGame ->
-            viewNewGame
+    let
+        layout =
+            case model.gameState of
+                NewGame ->
+                    viewNewGameButton
 
-        Playing ->
-            viewPlaying model
+                Playing ->
+                    viewPlaying model
 
-        GameOver ->
-            viewGameOver model
+                GameOver ->
+                    viewGameOver model
 
-        HandList ->
-            viewHandList
-
-
-viewNewGame : Html Msg
-viewNewGame =
-    Element.layout [ Background.color Color.darkGreen ] viewNewGameButton
+                HandList ->
+                    viewHandList
+    in
+        Element.layout [ Background.color Color.grey ] <|
+            Element.el
+                [ Background.color Color.darkGreen
+                , Element.height <| Element.px 600
+                , Element.width <| Element.px 600
+                , Element.centerX
+                , Element.centerY
+                ]
+                layout
 
 
 viewNewGameButton : Element.Element Msg
 viewNewGameButton =
     Input.button
-        [ Element.centerX ]
+        viewWhiteBarAtts
         { onPress = Just StartGame, label = Element.text "Start new game" }
 
 
-viewHandList : Html Msg
+viewHandList : Element.Element Msg
 viewHandList =
-    Element.layout
-        [ Background.color Color.darkGreen ]
-    <|
-        Element.column []
-            [ Element.el [] <| Element.text "Hand list goes here"
-            , Input.button [] { onPress = Just ResumePlaying, label = Element.text "Back to game" }
-            ]
+    Element.column []
+        [ Element.el [ Element.centerX, Element.centerY ] <|
+            Element.column [Element.width Element.fill] <|
+                List.map
+                viewHandListEntry
+                handListEntries
+        , Input.button viewWhiteBarAtts
+            { onPress = Just ResumePlaying, label = Element.text "Back to game" }
+        ]
 
 
-viewPlaying : Model -> Html Msg
+viewHandListEntry : ( String, String ) -> Element.Element Msg
+viewHandListEntry ( hand, score ) =
+    Element.row []
+        [ Element.el [ Element.alignLeft ] <| Element.text hand
+        , Element.el [ Element.alignRight ] <| Element.text score
+        ]
+
+
+handListEntries : List ( String, String )
+handListEntries =
+    [ ( "Straight Flush", "150pts" )
+    , ( "Four Of A Kind", "100pts" )
+    , ( "Flush", "90pts" )
+    , ( "Full House", "70pts" )
+    , ( "5 Card Straight", "50pts" )
+    , ( "Three Of A Kind", "30pts" )
+    , ( "3 Card Straight", "20pts" )
+    , ( "Pair", "10pts" )
+    ]
+
+
+viewPlaying : Model -> Element.Element Msg
 viewPlaying model =
     let
         cardView =
-            viewCard model.selected model.board model.bonus.suit
+            viewCard Board model.selected model.board model.bonus.suit
 
         stackView =
             viewStack cardView
     in
-        Element.layout
-            []
-        <|
-            Element.row
-                [ Element.centerY
-                , Element.height <| Element.px 600
-                , Element.width <| Element.px 600
-                , Background.color Color.darkGreen
+        Element.row
+            [ Element.height <| Element.px 600 ]
+            [ Element.el
+                [ Element.paddingXY 0 20
+                , Element.above <| viewPlayingInfo model
+                , Element.below <| viewPlayingActions model
                 ]
-                [ Element.column
-                    [ Element.spacing 20
-                    , Element.padding 50
-                    ]
-                    [ viewPlayingInfo model
-                    , viewBoard stackView model.board
-                    , viewPlayingActions model
-                    ]
-                , viewPlayingSidebar model
-                ]
+              <|
+                viewBoard stackView model.board
+            , viewPlayingSidebar model
+            ]
 
 
 viewPlayingInfo : Model -> Element.Element Msg
 viewPlayingInfo model =
-    if
-        validHand model.selected
-            && List.length (uniqueRows model.selected model.board)
-            > 1
-    then
-        viewPlayingInfoHand model
-    else if anyStraight model.selected && List.length model.selected == 4 then
-        Element.text "3 or 5 Card Straights only"
-    else if
-        List.length (suitCounts model.selected)
-            == 1
-            && (List.length model.selected == 3 || List.length model.selected == 4)
-    then
-        Element.text "Flushes must be 5 cards"
-    else if rankCounts model.selected == [ 2, 2 ] then
-        Element.text "Two Pair isn't a hand in Sage :("
-    else
-        Input.button [] { onPress = Just ShowHandList, label = Element.text "Show Hand List" }
+    let
+        content =
+            if
+                validHand model.selected
+                    && List.length (uniqueRows model.selected model.board)
+                    > 1
+            then
+                viewPlayingInfoHand model
+            else if anyStraight model.selected && List.length model.selected == 4 then
+                Element.text "3 or 5 Card Straights only"
+            else if
+                List.length (suitCounts model.selected)
+                    == 1
+                    && (List.length model.selected == 3 || List.length model.selected == 4)
+            then
+                Element.text "Flushes must be 5 cards"
+            else if rankCounts model.selected == [ 2, 2 ] then
+                Element.text "Two Pair isn't a hand in Sage :("
+            else
+                Input.button
+                    []
+                    { onPress = Just ShowHandList
+                    , label = Element.text "Show Hand List"
+                    }
+    in
+        Element.el viewWhiteBarAtts content
 
 
-viewGameOver : Model -> Html Msg
-viewGameOver model =
-    Element.layout [] <|
-        Element.column []
-            [ Element.el [] <|
-                Element.text <|
-                    "Game over - you scored "
-                        ++ toString model.score
-                        ++ ". Thanks for playing."
-            , viewNewGameButton
-            ]
+viewWhiteBarAtts : List (Element.Attribute Msg)
+viewWhiteBarAtts =
+    [ Element.centerX
+    , Element.width Element.fill
+    , Background.color Color.white
+    , Font.center
+    , Element.paddingXY 0 10
+    ]
 
 
 viewPlayingInfoHand : Model -> Element.Element Msg
@@ -473,6 +503,18 @@ viewPlayingInfoHand model =
                     ++ ")"
 
 
+viewGameOver : Model -> Element.Element Msg
+viewGameOver model =
+    Element.column []
+        [ Element.el [ Element.centerX, Element.centerY ] <|
+            Element.text <|
+                "Game over - you scored "
+                    ++ toString model.score
+                    ++ ". Thanks for playing."
+        , viewNewGameButton
+        ]
+
+
 viewPlayingActions : Model -> Element.Element Msg
 viewPlayingActions model =
     if List.length model.selected == 1 && model.trashes > 0 then
@@ -489,12 +531,12 @@ viewPlayingActionTrash model =
         card =
             List.head model.selected |> Maybe.withDefault dummyCard
     in
-        Input.button [] { onPress = Just (Trash card), label = Element.text "Trash" }
+        Input.button viewWhiteBarAtts { onPress = Just (Trash card), label = Element.text "Trash" }
 
 
 viewPlayingActionCashIn : Model -> Element.Element Msg
 viewPlayingActionCashIn model =
-    Input.button [] { onPress = Just (SubmitHand model.selected), label = Element.text "Cash In" }
+    Input.button viewWhiteBarAtts { onPress = Just (SubmitHand model.selected), label = Element.text "Cash In" }
 
 
 viewPlayingSidebar : Model -> Element.Element Msg
@@ -502,20 +544,20 @@ viewPlayingSidebar model =
     Element.column
         [ Background.color Color.lightGreen
         , Element.spaceEvenly
+        , Element.paddingXY 10 20
         ]
-        [ Element.el [] <| Element.text <| "Score: " ++ toString model.score
-        , Input.button [] { onPress = Just Hint, label = Element.text "Hint" }
-        , viewCard model.selected model.board model.bonus.suit model.bonus
-        , Element.el [] <| Element.text <| "Trashes: " ++ toString model.trashes
-        , let
-            percentComplete =
-                toFloat (List.length model.discarded) / 52.0
-          in
-            Element.el [] <| Element.text <| "Completed: " ++ toString percentComplete
-        , if List.length model.selected > 0 then
-            Input.button [] { onPress = Just Clear, label = Element.text "Clear" }
-          else
-            Element.empty
+        [ Element.el [ Element.centerX ] <| Element.text <| "Score: " ++ toString model.score
+        , Input.button viewWhiteBarAtts { onPress = Just Hint, label = Element.text "Hint" }
+        , viewCard Sidebar model.selected model.board model.bonus.suit model.bonus
+        , Element.el [ Element.centerX ] <|
+            Element.text <|
+                "Trashes: "
+                    ++ toString model.trashes
+        , Input.button
+            (viewWhiteBarAtts
+                ++ [ Element.transparent <| List.length model.selected == 0 ]
+            )
+            { onPress = Just Clear, label = Element.text "Clear" }
         ]
 
 
@@ -619,11 +661,13 @@ viewBoard stackView board =
             ListX.getAt y board
                 |> Maybe.withDefault dummyRow
                 |> List.map stackView
-                |> Element.row [ Element.spacing 5 ]
+                |> Element.row
+                    [ Element.paddingXY 20 0
+                    ]
     in
         List.range 0 (List.length board - 1)
             |> List.map viewRow
-            |> Element.column [ Element.spacing 5 ]
+            |> Element.column [ Element.moveUp 15 ]
 
 
 viewStack : (Card -> Element.Element Msg) -> List Card -> Element.Element Msg
@@ -632,10 +676,6 @@ viewStack cardView cards =
         stackAtts =
             [ Element.width <| Element.px 150
             , Element.height <| Element.px 150
-            , Border.solid
-            , Border.width 1
-            , Border.color <| Color.rgb 0 204 68
-            , Background.color <| Color.rgb 0 153 51
             , Element.paddingXY 15 25
             ]
     in
@@ -660,37 +700,56 @@ viewStack cardView cards =
                             ]
 
 
-viewCard : List Card -> Board -> Suit -> Card -> Element.Element Msg
-viewCard selected board bonus card =
+type CardLocation
+    = Board
+    | Sidebar
+
+
+viewCard : CardLocation -> List Card -> Board -> Suit -> Card -> Element.Element Msg
+viewCard location selected board bonus card =
     let
         selectionColor =
             if validHand selected && List.length (uniqueRows selected board) > 1 then
                 Color.yellow
             else
                 Color.red
+
+        locationAtts =
+            case location of
+                Board ->
+                    [ Events.onClick (ToggleCard card)
+                    , Element.pointer
+                    , if List.member card selected then
+                        Border.glow selectionColor 3
+                      else
+                        Border.glow Color.white 0
+                    ]
+
+                Sidebar ->
+                    [ Element.above <|
+                        Element.el
+                            [ Element.paddingXY 0 5
+                            , Element.centerX
+                            ]
+                        <|
+                            Element.text "Bonus suit"
+                    ]
     in
         Element.el
-            [ Element.inFront <| viewRank card.rank
-            , Element.inFront <| viewSuit card.suit
-            , Element.inFront <| viewBonusStar bonus card.suit
-            , Events.onClick (ToggleCard card)
-            , Element.width <| Element.px 70
-            , Element.height <| Element.px 100
-            , Element.pointer
-            , Element.centerX
-            , Element.alignTop
-            , Element.moveUp 10
-            , Background.color Color.white
-            , Border.rounded 6
-            , Border.width 2
-            , Border.solid
-            , Border.color Color.grey
-            , if List.member card selected then
-                Border.glow selectionColor 3
-              else
-                Border.glow Color.white 0
-            ]
-        <|
+            ([ Element.inFront <| viewRank card.rank
+             , Element.inFront <| viewSuit card.suit
+             , Element.inFront <| viewBonusStar bonus card.suit
+             , Element.width <| Element.px 70
+             , Element.height <| Element.px 100
+             , Background.color Color.white
+             , Border.rounded 6
+             , Border.width 1
+             , Border.solid
+             , Border.color Color.darkGrey
+             , Element.centerX
+             ]
+                ++ locationAtts
+            )
             Element.empty
 
 
