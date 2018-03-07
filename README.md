@@ -60,3 +60,5 @@ You have 2 Trashes initially. Making hands restores Trashes, up to this initial 
 - [ ] Add server-side high score table
 - [ ] Allow generation of game seed and manual input
 - [ ] Make layout responsive for mobile, etc.
+- [ ] Charge for hints, on a sliding (logarithmic?) scale
+- [ ] Add an undo function - at a cost(?)
