@@ -57,3 +57,6 @@ You have 2 Trashes initially. Making hands restores Trashes, up to this initial 
 - [ ] Add keyboard controls
 - [ ] Separate into smaller modules
 - [ ] Add in-game tutorial
+- [ ] Add server-side high score table
+- [ ] Allow generation of game seed and manual input
+- [ ] Make layout responsive for mobile, etc.
