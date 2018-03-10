@@ -53,12 +53,11 @@ You have 2 Trashes initially. Making hands restores Trashes, up to this initial 
 - [x] Implement bonus for clearing a stack
 - [x] Build complete layout with Stylish Elephants
 - [x] Fix offset of card with no others in stack
-- [ ] Improve best hand selection
-- [ ] Add keyboard controls
-- [ ] Separate into smaller modules
-- [ ] Add in-game tutorial
-- [ ] Add server-side high score table
-- [ ] Allow generation of game seed and manual input
-- [ ] Make layout responsive for mobile, etc.
-- [ ] Charge for hints, on a sliding (logarithmic?) scale
 - [ ] Add an undo function - at a cost(?)
+- [ ] Charge for hints, on a sliding (logarithmic?) scale
+- [ ] Make layout responsive for mobile, etc.
+- [ ] Add keyboard controls
+- [ ] Add in-game tutorial
+- [ ] Allow generation of game seed and manual input
+- [ ] Add server-side high score table
+- [ ] Improve best hand selection
