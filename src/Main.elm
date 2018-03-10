@@ -30,7 +30,7 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initModel, Random.generate OnShuffle shuffledCardsGenerator )
+    ( initModel, Cmd.none )
 
 
 type alias Model =
@@ -84,16 +84,6 @@ type GameState
     | HandList
 
 
-dummyCard : Card
-dummyCard =
-    Card Ace Spades
-
-
-dummyRow : List (List Card)
-dummyRow =
-    [ [ dummyCard ] ]
-
-
 type Msg
     = OnShuffle (List Card)
     | ToggleCard Card
@@ -126,9 +116,9 @@ boardFromDeck deck =
         |> ListX.groupsOf 3
 
 
-bonusFromDeck : List Card -> Card
-bonusFromDeck deck =
-    ListX.last deck |> Maybe.withDefault dummyCard
+dummyCard : Card
+dummyCard =
+    Card Ace Spades
 
 
 standardDeck : List Card
@@ -136,6 +126,11 @@ standardDeck =
     ListX.lift2 (flip Card)
         [ Hearts, Clubs, Diamonds, Spades ]
         orderedRanks
+
+
+orderedRanks : List Rank
+orderedRanks =
+    loopedRanks |> ListX.init |> Maybe.withDefault [ dummyCard.rank ]
 
 
 loopedRanks : List Rank
@@ -157,9 +152,9 @@ loopedRanks =
     ]
 
 
-orderedRanks : List Rank
-orderedRanks =
-    loopedRanks |> ListX.init |> Maybe.withDefault [ dummyCard.rank ]
+bonusFromDeck : List Card -> Card
+bonusFromDeck deck =
+    ListX.last deck |> Maybe.withDefault dummyCard
 
 
 clearStackBonuses : List (List Int)
@@ -266,9 +261,82 @@ update msg model =
                 ( { model | gameState = Playing }, Cmd.none )
 
 
-shuffledCardsGenerator : Generator (List Card)
-shuffledCardsGenerator =
-    Random.List.shuffle standardDeck
+boardInSelection : List Card -> Board -> List (List Bool)
+boardInSelection selection board =
+    board |> List.map (rowInSelection selection)
+
+
+rowInSelection : List Card -> List (List Card) -> List Bool
+rowInSelection selection row =
+    row |> List.map (stackInSelection selection)
+
+
+stackInSelection : List Card -> List Card -> Bool
+stackInSelection selection cards =
+    let
+        topCard =
+            List.head cards |> Maybe.withDefault dummyCard
+    in
+        List.member topCard selection
+
+
+lastCardsInBoard : Board -> List (List Bool)
+lastCardsInBoard board =
+    List.map lastCardsInRow board
+
+
+lastCardsInRow : List (List Card) -> List Bool
+lastCardsInRow row =
+    List.map lastCardInStack row
+
+
+lastCardInStack : List Card -> Bool
+lastCardInStack cards =
+    List.length cards == 1
+
+
+bonusScoreFromSelection :
+    List (List Bool)
+    -> List (List Bool)
+    -> List (List Int)
+    -> Int
+bonusScoreFromSelection selected lastCard bonus =
+    let
+        selections =
+            List.concat selected
+
+        lastCards =
+            List.concat lastCard
+
+        bonuses =
+            List.concat bonus
+    in
+        List.map3
+            (\sel lc bon ->
+                if sel && lc then
+                    bon
+                else
+                    0
+            )
+            selections
+            lastCards
+            bonuses
+            |> List.sum
+
+
+removeCardFromBoard : Card -> Board -> Board
+removeCardFromBoard card board =
+    board |> List.map (removeCardFromRow card)
+
+
+removeCardFromRow : Card -> List (List Card) -> List (List Card)
+removeCardFromRow card row =
+    row |> List.map (removeCardFromStack card)
+
+
+removeCardFromStack : Card -> List Card -> List Card
+removeCardFromStack card stack =
+    ListX.remove card stack
 
 
 updateGameState : Model -> Model
@@ -297,15 +365,6 @@ noMoreMoves model =
             scoredHandsFromBoard model.board model.bonus.suit
     in
         List.length scoredHands == 0 && model.trashes == 0
-
-
-type alias ScoredHand =
-    { hand : List Card
-    , handName : String
-    , baseScore : Int
-    , isBonus : Bool
-    , actualScore : Int
-    }
 
 
 scoreHand : List Card -> Suit -> ScoredHand
@@ -344,6 +403,192 @@ scoreHand cards bonus =
             else
                 baseScore
         }
+
+
+type alias ScoredHand =
+    { hand : List Card
+    , handName : String
+    , baseScore : Int
+    , isBonus : Bool
+    , actualScore : Int
+    }
+
+
+pair : List Card -> Bool
+pair sel =
+    rankCounts sel == [ 2 ]
+
+
+threeCardStraight : List Card -> Bool
+threeCardStraight sel =
+    List.length sel == 3 && anyStraight sel
+
+
+threeOfAKind : List Card -> Bool
+threeOfAKind sel =
+    rankCounts sel == [ 3 ]
+
+
+fiveCardStraight : List Card -> Bool
+fiveCardStraight sel =
+    List.length sel == 5 && anyStraight sel
+
+
+fullHouse : List Card -> Bool
+fullHouse sel =
+    rankCounts sel == [ 2, 3 ] || rankCounts sel == [ 3, 2 ]
+
+
+fiveCardFlush : List Card -> Bool
+fiveCardFlush sel =
+    List.length sel == 5 && List.length (suitCounts sel) == 1
+
+
+fourOfAKind : List Card -> Bool
+fourOfAKind sel =
+    rankCounts sel == [ 4 ]
+
+
+straightFlush : List Card -> Bool
+straightFlush sel =
+    fiveCardStraight sel && List.length (suitCounts sel) == 1
+
+
+anyStraight : List Card -> Bool
+anyStraight sel =
+    sel
+        |> List.map .rank
+        |> ListX.permutations
+        |> List.any (flip ListX.isInfixOf loopedRanks)
+
+
+rankCounts : List Card -> List Int
+rankCounts sel =
+    handCounts sel .rank rankToInt
+
+
+suitCounts : List Card -> List Int
+suitCounts sel =
+    handCounts sel .suit suitToInt
+
+
+handCounts : List Card -> (Card -> a) -> (a -> Int) -> List Int
+handCounts selection component sortfunc =
+    selection
+        |> List.map component
+        |> List.sortBy sortfunc
+        |> ListX.group
+        |> List.map List.length
+
+
+rankToInt : Rank -> Int
+rankToInt rank =
+    ListX.elemIndex rank orderedRanks |> Maybe.withDefault 1
+
+
+suitToInt : Suit -> Int
+suitToInt suit =
+    case suit of
+        Hearts ->
+            1
+
+        Clubs ->
+            2
+
+        Diamonds ->
+            3
+
+        Spades ->
+            4
+
+
+scoredHandsFromBoard : Board -> Suit -> List ScoredHand
+scoredHandsFromBoard board bonus =
+    let
+        validHands =
+            board
+                |> List.concat
+                |> List.map List.head
+                |> MaybeX.values
+                |> ListX.subsequences
+                |> List.filter
+                    (\hand ->
+                        validHand hand
+                            && (List.length (uniqueRows hand board) > 1)
+                    )
+    in
+        validHands |> List.map (\hand -> scoreHand hand bonus)
+
+
+validHand : List Card -> Bool
+validHand sel =
+    pair sel
+        || threeCardStraight sel
+        || threeOfAKind sel
+        || fiveCardStraight sel
+        || fullHouse sel
+        || fiveCardFlush sel
+        || fourOfAKind sel
+        || straightFlush sel
+
+
+uniqueRows : List Card -> Board -> List Int
+uniqueRows searches grid =
+    searches
+        |> List.concatMap (inRowAll grid)
+        |> ListX.unique
+
+
+inRowAll : Board -> Card -> List Int
+inRowAll grid target =
+    grid
+        |> List.indexedMap (inRow target)
+        |> List.filterMap identity
+
+
+inRow : Card -> Int -> List (List Card) -> Maybe Int
+inRow target rownum row =
+    if List.member target (List.concat row) then
+        Just rownum
+    else
+        Nothing
+
+
+bestHandFromScored : List ScoredHand -> ScoredHand
+bestHandFromScored hands =
+    let
+        maxScore =
+            hands
+                |> List.map .actualScore
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+        highScoringHands =
+            hands
+                |> List.filter (\hand -> hand.actualScore == maxScore)
+
+        maxLengthHighScorers =
+            highScoringHands
+                |> List.map .hand
+                |> List.map List.length
+                |> List.maximum
+                |> Maybe.withDefault 0
+
+        longestHighScorers =
+            highScoringHands
+                |> List.filter
+                    (\hand ->
+                        List.length hand.hand == maxLengthHighScorers
+                    )
+    in
+        longestHighScorers
+            |> List.head
+            |> Maybe.withDefault (ScoredHand [ dummyCard ] "Dummy" 0 False 0)
+
+
+shuffledCardsGenerator : Generator (List Card)
+shuffledCardsGenerator =
+    Random.List.shuffle standardDeck
 
 
 
@@ -385,37 +630,13 @@ viewNewGameButton =
         { onPress = Just StartGame, label = Element.text "Start new game" }
 
 
-viewHandList : Element.Element Msg
-viewHandList =
-    Element.column []
-        [ Element.el [ Element.centerX, Element.centerY ] <|
-            Element.column [ Element.width Element.fill ] <|
-                List.map
-                    viewHandListEntry
-                    handListEntries
-        , Input.button viewWhiteBarAtts
-            { onPress = Just ResumePlaying, label = Element.text "Back to game" }
-        ]
-
-
-viewHandListEntry : ( String, String ) -> Element.Element Msg
-viewHandListEntry ( hand, score ) =
-    Element.row []
-        [ Element.el [ Element.alignLeft ] <| Element.text hand
-        , Element.el [ Element.alignRight ] <| Element.text score
-        ]
-
-
-handListEntries : List ( String, String )
-handListEntries =
-    [ ( "Straight Flush", "150pts" )
-    , ( "Four Of A Kind", "100pts" )
-    , ( "Flush", "90pts" )
-    , ( "Full House", "70pts" )
-    , ( "5 Card Straight", "50pts" )
-    , ( "Three Of A Kind", "30pts" )
-    , ( "3 Card Straight", "20pts" )
-    , ( "Pair", "10pts" )
+viewWhiteBarAtts : List (Element.Attribute Msg)
+viewWhiteBarAtts =
+    [ Element.centerX
+    , Element.width Element.fill
+    , Background.color Color.white
+    , Font.center
+    , Element.paddingXY 0 10
     ]
 
 
@@ -441,249 +662,21 @@ viewPlaying model =
             ]
 
 
-viewPlayingInfo : Model -> Element.Element Msg
-viewPlayingInfo model =
-    let
-        content =
-            if
-                validHand model.selected
-                    && List.length (uniqueRows model.selected model.board)
-                    > 1
-            then
-                viewPlayingInfoHand model
-            else if anyStraight model.selected && List.length model.selected == 4 then
-                Element.text "3 or 5 Card Straights only"
-            else if
-                List.length (suitCounts model.selected)
-                    == 1
-                    && (List.length model.selected == 3 || List.length model.selected == 4)
-            then
-                Element.text "Flushes must be 5 cards"
-            else if rankCounts model.selected == [ 2, 2 ] then
-                Element.text "Two Pair isn't a hand in Sage :("
-            else
-                Input.button
-                    []
-                    { onPress = Just ShowHandList
-                    , label = Element.text "Show Hand List"
-                    }
-    in
-        Element.el viewWhiteBarAtts content
-
-
-viewWhiteBarAtts : List (Element.Attribute Msg)
-viewWhiteBarAtts =
-    [ Element.centerX
-    , Element.width Element.fill
-    , Background.color Color.white
-    , Font.center
-    , Element.paddingXY 0 10
-    ]
-
-
-viewPlayingInfoHand : Model -> Element.Element Msg
-viewPlayingInfoHand model =
-    let
-        hand =
-            scoreHand model.selected model.bonus.suit
-
-        bonusText =
-            if hand.isBonus then
-                " x2"
-            else
-                ""
-    in
-        Element.el [] <|
-            Element.text <|
-                hand.handName
-                    ++ " ("
-                    ++ toString hand.baseScore
-                    ++ " pts"
-                    ++ bonusText
-                    ++ ")"
-
-
-viewGameOver : Model -> Element.Element Msg
-viewGameOver model =
-    Element.column []
-        [ Element.el [ Element.centerX, Element.centerY ] <|
-            Element.text <|
-                "Game over - you scored "
-                    ++ toString model.score
-                    ++ ". Thanks for playing."
-        , viewNewGameButton
-        ]
-
-
-viewPlayingActions : Model -> Element.Element Msg
-viewPlayingActions model =
-    if List.length model.selected == 1 && model.trashes > 0 then
-        viewPlayingActionTrash model
-    else if validHand model.selected && List.length (uniqueRows model.selected model.board) > 1 then
-        viewPlayingActionCashIn model
-    else
-        Element.empty
-
-
-viewPlayingActionTrash : Model -> Element.Element Msg
-viewPlayingActionTrash model =
-    let
-        card =
-            List.head model.selected |> Maybe.withDefault dummyCard
-    in
-        Input.button viewWhiteBarAtts { onPress = Just (Trash card), label = Element.text "Trash" }
-
-
-viewPlayingActionCashIn : Model -> Element.Element Msg
-viewPlayingActionCashIn model =
-    Input.button viewWhiteBarAtts { onPress = Just (SubmitHand model.selected), label = Element.text "Cash In" }
-
-
-viewPlayingSidebar : Model -> Element.Element Msg
-viewPlayingSidebar model =
-    Element.column
-        [ Background.color Color.lightGreen
-        , Element.spaceEvenly
-        , Element.paddingXY 10 20
-        ]
-        [ Element.el [ Element.centerX ] <| Element.text <| "Score: " ++ toString model.score
-        , Input.button viewWhiteBarAtts { onPress = Just Hint, label = Element.text "Hint" }
-        , viewCard Sidebar model.selected model.board model.bonus.suit model.bonus
-        , Element.el [ Element.centerX ] <|
-            Element.text <|
-                "Trashes: "
-                    ++ toString model.trashes
-        , Input.button
-            (viewWhiteBarAtts
-                ++ [ Element.transparent <| List.length model.selected == 0 ]
-            )
-            { onPress = Just Clear, label = Element.text "Clear" }
-        ]
-
-
-scoredHandsFromBoard : Board -> Suit -> List ScoredHand
-scoredHandsFromBoard board bonus =
-    let
-        validHands =
-            board
-                |> List.concat
-                |> List.map List.head
-                |> MaybeX.values
-                |> ListX.subsequences
-                |> List.filter
-                    (\hand ->
-                        validHand hand
-                            && (List.length (uniqueRows hand board) > 1)
-                    )
-    in
-        validHands |> List.map (\hand -> scoreHand hand bonus)
-
-
-bestHandFromScored : List ScoredHand -> ScoredHand
-bestHandFromScored hands =
-    let
-        maxScore =
-            hands |> List.map .actualScore |> List.maximum |> Maybe.withDefault 0
-
-        highScoringHands =
-            hands
-                |> List.filter (\hand -> hand.actualScore == maxScore)
-
-        maxLengthHighScorers =
-            highScoringHands
-                |> List.map .hand
-                |> List.map List.length
-                |> List.maximum
-                |> Maybe.withDefault 0
-
-        longestHighScorers =
-            highScoringHands
-                |> List.filter (\hand -> List.length hand.hand == maxLengthHighScorers)
-    in
-        longestHighScorers
-            |> List.head
-            |> Maybe.withDefault (ScoredHand [ dummyCard ] "Dummy" 0 False 0)
-
-
-inRow : Card -> Int -> List (List Card) -> Maybe Int
-inRow target rownum row =
-    if List.member target (List.concat row) then
-        Just rownum
-    else
-        Nothing
-
-
-inRowAll : Board -> Card -> List Int
-inRowAll grid target =
-    grid
-        |> List.indexedMap (inRow target)
-        |> List.filterMap identity
-
-
-uniqueRows : List Card -> Board -> List Int
-uniqueRows searches grid =
-    searches
-        |> List.concatMap (inRowAll grid)
-        |> ListX.unique
-
-
-viewBoard : (List Card -> Element.Element Msg) -> Board -> Element.Element Msg
-viewBoard stackView board =
-    let
-        viewRow : Int -> Element.Element Msg
-        viewRow y =
-            ListX.getAt y board
-                |> Maybe.withDefault dummyRow
-                |> List.map stackView
-                |> Element.row
-                    [ Element.paddingXY 20 0
-                    ]
-    in
-        List.range 0 (List.length board - 1)
-            |> List.map viewRow
-            |> Element.column [ Element.moveUp 15 ]
-
-
-viewStack : (Card -> Element.Element Msg) -> List Card -> Element.Element Msg
-viewStack cardView cards =
-    let
-        stackAtts =
-            [ Element.width <| Element.px 150
-            , Element.height <| Element.px 150
-            , Element.paddingXY 15 25
-            ]
-    in
-        case List.head cards of
-            Nothing ->
-                Element.el stackAtts Element.empty
-
-            Just card ->
-                let
-                    cardString =
-                        String.concat <| List.repeat (List.length cards - 1) "🂠"
-                in
-                    Element.el stackAtts <|
-                        Element.column []
-                            [ cardView card
-                            , Element.el
-                                [ Font.color Color.white
-                                , Element.centerX
-                                ]
-                              <|
-                                Element.text cardString
-                            ]
-
-
-type CardLocation
-    = Board
-    | Sidebar
-
-
-viewCard : CardLocation -> List Card -> Board -> Suit -> Card -> Element.Element Msg
+viewCard :
+    CardLocation
+    -> List Card
+    -> Board
+    -> Suit
+    -> Card
+    -> Element.Element Msg
 viewCard location selected board bonus card =
     let
         selectionColor =
-            if validHand selected && List.length (uniqueRows selected board) > 1 then
+            if
+                validHand selected
+                    && List.length (uniqueRows selected board)
+                    > 1
+            then
                 Color.yellow
             else
                 Color.red
@@ -727,157 +720,9 @@ viewCard location selected board bonus card =
             Element.empty
 
 
-stackInSelection : List Card -> List Card -> Bool
-stackInSelection selection cards =
-    let
-        topCard =
-            List.head cards |> Maybe.withDefault dummyCard
-    in
-        List.member topCard selection
-
-
-rowInSelection : List Card -> List (List Card) -> List Bool
-rowInSelection selection row =
-    row |> List.map (stackInSelection selection)
-
-
-boardInSelection : List Card -> Board -> List (List Bool)
-boardInSelection selection board =
-    board |> List.map (rowInSelection selection)
-
-
-bonusScoreFromSelection : List (List Bool) -> List (List Bool) -> List (List Int) -> Int
-bonusScoreFromSelection selected lastCard bonus =
-    let
-        selections =
-            List.concat selected
-
-        lastCards =
-            List.concat lastCard
-
-        bonuses =
-            List.concat bonus
-    in
-        List.map3
-            (\sel lc bon ->
-                if sel && lc then
-                    bon
-                else
-                    0
-            )
-            selections
-            lastCards
-            bonuses
-            |> List.sum
-
-
-lastCardInStack : List Card -> Bool
-lastCardInStack cards =
-    List.length cards == 1
-
-
-lastCardsInRow : List (List Card) -> List Bool
-lastCardsInRow row =
-    List.map lastCardInStack row
-
-
-lastCardsInBoard : Board -> List (List Bool)
-lastCardsInBoard board =
-    List.map lastCardsInRow board
-
-
-removeCardFromStack : Card -> List Card -> List Card
-removeCardFromStack card stack =
-    ListX.remove card stack
-
-
-removeCardFromRow : Card -> List (List Card) -> List (List Card)
-removeCardFromRow card row =
-    row |> List.map (removeCardFromStack card)
-
-
-removeCardFromBoard : Card -> Board -> Board
-removeCardFromBoard card board =
-    board |> List.map (removeCardFromRow card)
-
-
-validHand : List Card -> Bool
-validHand sel =
-    pair sel
-        || threeCardStraight sel
-        || threeOfAKind sel
-        || fiveCardStraight sel
-        || fullHouse sel
-        || fiveCardFlush sel
-        || fourOfAKind sel
-        || straightFlush sel
-
-
-handCounts : List Card -> (Card -> a) -> (a -> Int) -> List Int
-handCounts selection component sortfunc =
-    selection
-        |> List.map component
-        |> List.sortBy sortfunc
-        |> ListX.group
-        |> List.map List.length
-
-
-rankCounts : List Card -> List Int
-rankCounts sel =
-    handCounts sel .rank rankToInt
-
-
-suitCounts : List Card -> List Int
-suitCounts sel =
-    handCounts sel .suit suitToInt
-
-
-anyStraight : List Card -> Bool
-anyStraight sel =
-    sel
-        |> List.map .rank
-        |> ListX.permutations
-        |> List.any (flip ListX.isInfixOf loopedRanks)
-
-
-pair : List Card -> Bool
-pair sel =
-    rankCounts sel == [ 2 ]
-
-
-threeCardStraight : List Card -> Bool
-threeCardStraight sel =
-    List.length sel == 3 && anyStraight sel
-
-
-threeOfAKind : List Card -> Bool
-threeOfAKind sel =
-    rankCounts sel == [ 3 ]
-
-
-fiveCardStraight : List Card -> Bool
-fiveCardStraight sel =
-    List.length sel == 5 && anyStraight sel
-
-
-fullHouse : List Card -> Bool
-fullHouse sel =
-    rankCounts sel == [ 2, 3 ] || rankCounts sel == [ 3, 2 ]
-
-
-fiveCardFlush : List Card -> Bool
-fiveCardFlush sel =
-    List.length sel == 5 && List.length (suitCounts sel) == 1
-
-
-fourOfAKind : List Card -> Bool
-fourOfAKind sel =
-    rankCounts sel == [ 4 ]
-
-
-straightFlush : List Card -> Bool
-straightFlush sel =
-    fiveCardStraight sel && List.length (suitCounts sel) == 1
+type CardLocation
+    = Board
+    | Sidebar
 
 
 viewRank : Rank -> Element.Element Msg
@@ -971,25 +816,219 @@ viewBonusStar bonusSuit cardSuit =
         Element.empty
 
 
-rankToInt : Rank -> Int
-rankToInt rank =
-    ListX.elemIndex rank orderedRanks |> Maybe.withDefault 1
+viewStack : (Card -> Element.Element Msg) -> List Card -> Element.Element Msg
+viewStack cardView cards =
+    let
+        stackAtts =
+            [ Element.width <| Element.px 150
+            , Element.height <| Element.px 150
+            , Element.paddingXY 15 25
+            ]
+    in
+        case List.head cards of
+            Nothing ->
+                Element.el stackAtts Element.empty
+
+            Just card ->
+                let
+                    cardString =
+                        String.concat <| List.repeat (List.length cards - 1) "🂠"
+                in
+                    Element.el stackAtts <|
+                        Element.column []
+                            [ cardView card
+                            , Element.el
+                                [ Font.color Color.white
+                                , Element.centerX
+                                ]
+                              <|
+                                Element.text cardString
+                            ]
 
 
-suitToInt : Suit -> Int
-suitToInt suit =
-    case suit of
-        Hearts ->
-            1
+viewPlayingInfo : Model -> Element.Element Msg
+viewPlayingInfo model =
+    let
+        content =
+            if
+                validHand model.selected
+                    && List.length (uniqueRows model.selected model.board)
+                    > 1
+            then
+                viewPlayingInfoHand model
+            else if
+                anyStraight model.selected
+                    && List.length model.selected
+                    == 4
+            then
+                Element.text "3 or 5 Card Straights only"
+            else if
+                List.length (suitCounts model.selected)
+                    == 1
+                    && (List.length model.selected
+                            == 3
+                            || List.length model.selected
+                            == 4
+                       )
+            then
+                Element.text "Flushes must be 5 cards"
+            else if rankCounts model.selected == [ 2, 2 ] then
+                Element.text "Two Pair isn't a hand in Sage :("
+            else
+                Input.button
+                    []
+                    { onPress = Just ShowHandList
+                    , label = Element.text "Show Hand List"
+                    }
+    in
+        Element.el viewWhiteBarAtts content
 
-        Clubs ->
-            2
 
-        Diamonds ->
-            3
+viewPlayingInfoHand : Model -> Element.Element Msg
+viewPlayingInfoHand model =
+    let
+        hand =
+            scoreHand model.selected model.bonus.suit
 
-        Spades ->
-            4
+        bonusText =
+            if hand.isBonus then
+                " x2"
+            else
+                ""
+    in
+        Element.el [] <|
+            Element.text <|
+                hand.handName
+                    ++ " ("
+                    ++ toString hand.baseScore
+                    ++ " pts"
+                    ++ bonusText
+                    ++ ")"
+
+
+viewPlayingActions : Model -> Element.Element Msg
+viewPlayingActions model =
+    if List.length model.selected == 1 && model.trashes > 0 then
+        viewPlayingActionTrash model
+    else if
+        validHand model.selected
+            && List.length (uniqueRows model.selected model.board)
+            > 1
+    then
+        viewPlayingActionCashIn model
+    else
+        Element.empty
+
+
+viewPlayingActionTrash : Model -> Element.Element Msg
+viewPlayingActionTrash model =
+    let
+        card =
+            List.head model.selected |> Maybe.withDefault dummyCard
+    in
+        Input.button viewWhiteBarAtts
+            { onPress = Just (Trash card)
+            , label = Element.text "Trash"
+            }
+
+
+viewPlayingActionCashIn : Model -> Element.Element Msg
+viewPlayingActionCashIn model =
+    Input.button viewWhiteBarAtts
+        { onPress = Just (SubmitHand model.selected)
+        , label = Element.text "Cash In"
+        }
+
+
+viewBoard : (List Card -> Element.Element Msg) -> Board -> Element.Element Msg
+viewBoard stackView board =
+    let
+        viewRow : Int -> Element.Element Msg
+        viewRow y =
+            ListX.getAt y board
+                |> Maybe.withDefault [ [ dummyCard ] ]
+                |> List.map stackView
+                |> Element.row
+                    [ Element.paddingXY 20 0
+                    ]
+    in
+        List.range 0 (List.length board - 1)
+            |> List.map viewRow
+            |> Element.column [ Element.moveUp 15 ]
+
+
+viewPlayingSidebar : Model -> Element.Element Msg
+viewPlayingSidebar model =
+    Element.column
+        [ Background.color Color.lightGreen
+        , Element.spaceEvenly
+        , Element.paddingXY 10 20
+        ]
+        [ Element.el [ Element.centerX ] <|
+            Element.text <|
+                "Score: "
+                    ++ toString model.score
+        , Input.button viewWhiteBarAtts
+            { onPress = Just Hint
+            , label = Element.text "Hint"
+            }
+        , viewCard Sidebar model.selected model.board model.bonus.suit model.bonus
+        , Element.el [ Element.centerX ] <|
+            Element.text <|
+                "Trashes: "
+                    ++ toString model.trashes
+        , Input.button
+            (viewWhiteBarAtts
+                ++ [ Element.transparent <| List.length model.selected == 0 ]
+            )
+            { onPress = Just Clear, label = Element.text "Clear" }
+        ]
+
+
+viewGameOver : Model -> Element.Element Msg
+viewGameOver model =
+    Element.column []
+        [ Element.el [ Element.centerX, Element.centerY ] <|
+            Element.text <|
+                "Game over - you scored "
+                    ++ toString model.score
+                    ++ ". Thanks for playing."
+        , viewNewGameButton
+        ]
+
+
+viewHandList : Element.Element Msg
+viewHandList =
+    Element.column []
+        [ Element.el [ Element.centerX, Element.centerY ] <|
+            Element.column [ Element.width Element.fill ] <|
+                List.map
+                    viewHandListEntry
+                    handListEntries
+        , Input.button viewWhiteBarAtts
+            { onPress = Just ResumePlaying, label = Element.text "Back to game" }
+        ]
+
+
+viewHandListEntry : ( String, String ) -> Element.Element Msg
+viewHandListEntry ( hand, score ) =
+    Element.row []
+        [ Element.el [ Element.alignLeft ] <| Element.text hand
+        , Element.el [ Element.alignRight ] <| Element.text score
+        ]
+
+
+handListEntries : List ( String, String )
+handListEntries =
+    [ ( "Straight Flush", "150pts" )
+    , ( "Four Of A Kind", "100pts" )
+    , ( "Flush", "90pts" )
+    , ( "Full House", "70pts" )
+    , ( "5 Card Straight", "50pts" )
+    , ( "Three Of A Kind", "30pts" )
+    , ( "3 Card Straight", "20pts" )
+    , ( "Pair", "10pts" )
+    ]
 
 
 
