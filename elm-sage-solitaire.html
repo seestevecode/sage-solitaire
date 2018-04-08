@@ -888,6 +888,37 @@ var _elm_lang$core$Basics$LT = {ctor: 'LT'};
 var _elm_lang$core$Basics$JustOneMore = function (a) {
 	return {ctor: 'JustOneMore', _0: a};
 };
+//import Native.Utils //
+
+var _elm_lang$core$Native_Debug = function() {
+
+function log(tag, value)
+{
+	var msg = tag + ': ' + _elm_lang$core$Native_Utils.toString(value);
+	var process = process || {};
+	if (process.stdout)
+	{
+		process.stdout.write(msg);
+	}
+	else
+	{
+		console.log(msg);
+	}
+	return value;
+}
+
+function crash(message)
+{
+	throw new Error(message);
+}
+
+return {
+	crash: crash,
+	log: F2(log)
+};
+
+}();var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
+var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
 var _elm_lang$core$Maybe$withDefault = F2(
 	function ($default, maybe) {
 		var _p0 = maybe;
@@ -1648,36 +1679,148 @@ var _elm_lang$core$List$indexedMap = F2(
 				_elm_lang$core$List$length(xs) - 1),
 			xs);
 	});
-//import Native.Utils //
-
-var _elm_lang$core$Native_Debug = function() {
-
-function log(tag, value)
-{
-	var msg = tag + ': ' + _elm_lang$core$Native_Utils.toString(value);
-	var process = process || {};
-	if (process.stdout)
-	{
-		process.stdout.write(msg);
+var _elm_lang$core$Result$toMaybe = function (result) {
+	var _p0 = result;
+	if (_p0.ctor === 'Ok') {
+		return _elm_lang$core$Maybe$Just(_p0._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
 	}
-	else
-	{
-		console.log(msg);
-	}
-	return value;
-}
-
-function crash(message)
-{
-	throw new Error(message);
-}
-
-return {
-	crash: crash,
-	log: F2(log)
 };
-
-}();//import Maybe, Native.List, Native.Utils, Result //
+var _elm_lang$core$Result$withDefault = F2(
+	function (def, result) {
+		var _p1 = result;
+		if (_p1.ctor === 'Ok') {
+			return _p1._0;
+		} else {
+			return def;
+		}
+	});
+var _elm_lang$core$Result$Err = function (a) {
+	return {ctor: 'Err', _0: a};
+};
+var _elm_lang$core$Result$andThen = F2(
+	function (callback, result) {
+		var _p2 = result;
+		if (_p2.ctor === 'Ok') {
+			return callback(_p2._0);
+		} else {
+			return _elm_lang$core$Result$Err(_p2._0);
+		}
+	});
+var _elm_lang$core$Result$Ok = function (a) {
+	return {ctor: 'Ok', _0: a};
+};
+var _elm_lang$core$Result$map = F2(
+	function (func, ra) {
+		var _p3 = ra;
+		if (_p3.ctor === 'Ok') {
+			return _elm_lang$core$Result$Ok(
+				func(_p3._0));
+		} else {
+			return _elm_lang$core$Result$Err(_p3._0);
+		}
+	});
+var _elm_lang$core$Result$map2 = F3(
+	function (func, ra, rb) {
+		var _p4 = {ctor: '_Tuple2', _0: ra, _1: rb};
+		if (_p4._0.ctor === 'Ok') {
+			if (_p4._1.ctor === 'Ok') {
+				return _elm_lang$core$Result$Ok(
+					A2(func, _p4._0._0, _p4._1._0));
+			} else {
+				return _elm_lang$core$Result$Err(_p4._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p4._0._0);
+		}
+	});
+var _elm_lang$core$Result$map3 = F4(
+	function (func, ra, rb, rc) {
+		var _p5 = {ctor: '_Tuple3', _0: ra, _1: rb, _2: rc};
+		if (_p5._0.ctor === 'Ok') {
+			if (_p5._1.ctor === 'Ok') {
+				if (_p5._2.ctor === 'Ok') {
+					return _elm_lang$core$Result$Ok(
+						A3(func, _p5._0._0, _p5._1._0, _p5._2._0));
+				} else {
+					return _elm_lang$core$Result$Err(_p5._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p5._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p5._0._0);
+		}
+	});
+var _elm_lang$core$Result$map4 = F5(
+	function (func, ra, rb, rc, rd) {
+		var _p6 = {ctor: '_Tuple4', _0: ra, _1: rb, _2: rc, _3: rd};
+		if (_p6._0.ctor === 'Ok') {
+			if (_p6._1.ctor === 'Ok') {
+				if (_p6._2.ctor === 'Ok') {
+					if (_p6._3.ctor === 'Ok') {
+						return _elm_lang$core$Result$Ok(
+							A4(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0));
+					} else {
+						return _elm_lang$core$Result$Err(_p6._3._0);
+					}
+				} else {
+					return _elm_lang$core$Result$Err(_p6._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p6._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p6._0._0);
+		}
+	});
+var _elm_lang$core$Result$map5 = F6(
+	function (func, ra, rb, rc, rd, re) {
+		var _p7 = {ctor: '_Tuple5', _0: ra, _1: rb, _2: rc, _3: rd, _4: re};
+		if (_p7._0.ctor === 'Ok') {
+			if (_p7._1.ctor === 'Ok') {
+				if (_p7._2.ctor === 'Ok') {
+					if (_p7._3.ctor === 'Ok') {
+						if (_p7._4.ctor === 'Ok') {
+							return _elm_lang$core$Result$Ok(
+								A5(func, _p7._0._0, _p7._1._0, _p7._2._0, _p7._3._0, _p7._4._0));
+						} else {
+							return _elm_lang$core$Result$Err(_p7._4._0);
+						}
+					} else {
+						return _elm_lang$core$Result$Err(_p7._3._0);
+					}
+				} else {
+					return _elm_lang$core$Result$Err(_p7._2._0);
+				}
+			} else {
+				return _elm_lang$core$Result$Err(_p7._1._0);
+			}
+		} else {
+			return _elm_lang$core$Result$Err(_p7._0._0);
+		}
+	});
+var _elm_lang$core$Result$mapError = F2(
+	function (f, result) {
+		var _p8 = result;
+		if (_p8.ctor === 'Ok') {
+			return _elm_lang$core$Result$Ok(_p8._0);
+		} else {
+			return _elm_lang$core$Result$Err(
+				f(_p8._0));
+		}
+	});
+var _elm_lang$core$Result$fromMaybe = F2(
+	function (err, maybe) {
+		var _p9 = maybe;
+		if (_p9.ctor === 'Just') {
+			return _elm_lang$core$Result$Ok(_p9._0);
+		} else {
+			return _elm_lang$core$Result$Err(err);
+		}
+	});
+//import Maybe, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_String = function() {
 
@@ -2071,147 +2214,6 @@ var _elm_lang$core$Char$isHexDigit = function ($char) {
 		_elm_lang$core$Native_Utils.chr('F'),
 		$char));
 };
-var _elm_lang$core$Result$toMaybe = function (result) {
-	var _p0 = result;
-	if (_p0.ctor === 'Ok') {
-		return _elm_lang$core$Maybe$Just(_p0._0);
-	} else {
-		return _elm_lang$core$Maybe$Nothing;
-	}
-};
-var _elm_lang$core$Result$withDefault = F2(
-	function (def, result) {
-		var _p1 = result;
-		if (_p1.ctor === 'Ok') {
-			return _p1._0;
-		} else {
-			return def;
-		}
-	});
-var _elm_lang$core$Result$Err = function (a) {
-	return {ctor: 'Err', _0: a};
-};
-var _elm_lang$core$Result$andThen = F2(
-	function (callback, result) {
-		var _p2 = result;
-		if (_p2.ctor === 'Ok') {
-			return callback(_p2._0);
-		} else {
-			return _elm_lang$core$Result$Err(_p2._0);
-		}
-	});
-var _elm_lang$core$Result$Ok = function (a) {
-	return {ctor: 'Ok', _0: a};
-};
-var _elm_lang$core$Result$map = F2(
-	function (func, ra) {
-		var _p3 = ra;
-		if (_p3.ctor === 'Ok') {
-			return _elm_lang$core$Result$Ok(
-				func(_p3._0));
-		} else {
-			return _elm_lang$core$Result$Err(_p3._0);
-		}
-	});
-var _elm_lang$core$Result$map2 = F3(
-	function (func, ra, rb) {
-		var _p4 = {ctor: '_Tuple2', _0: ra, _1: rb};
-		if (_p4._0.ctor === 'Ok') {
-			if (_p4._1.ctor === 'Ok') {
-				return _elm_lang$core$Result$Ok(
-					A2(func, _p4._0._0, _p4._1._0));
-			} else {
-				return _elm_lang$core$Result$Err(_p4._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p4._0._0);
-		}
-	});
-var _elm_lang$core$Result$map3 = F4(
-	function (func, ra, rb, rc) {
-		var _p5 = {ctor: '_Tuple3', _0: ra, _1: rb, _2: rc};
-		if (_p5._0.ctor === 'Ok') {
-			if (_p5._1.ctor === 'Ok') {
-				if (_p5._2.ctor === 'Ok') {
-					return _elm_lang$core$Result$Ok(
-						A3(func, _p5._0._0, _p5._1._0, _p5._2._0));
-				} else {
-					return _elm_lang$core$Result$Err(_p5._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p5._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p5._0._0);
-		}
-	});
-var _elm_lang$core$Result$map4 = F5(
-	function (func, ra, rb, rc, rd) {
-		var _p6 = {ctor: '_Tuple4', _0: ra, _1: rb, _2: rc, _3: rd};
-		if (_p6._0.ctor === 'Ok') {
-			if (_p6._1.ctor === 'Ok') {
-				if (_p6._2.ctor === 'Ok') {
-					if (_p6._3.ctor === 'Ok') {
-						return _elm_lang$core$Result$Ok(
-							A4(func, _p6._0._0, _p6._1._0, _p6._2._0, _p6._3._0));
-					} else {
-						return _elm_lang$core$Result$Err(_p6._3._0);
-					}
-				} else {
-					return _elm_lang$core$Result$Err(_p6._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p6._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p6._0._0);
-		}
-	});
-var _elm_lang$core$Result$map5 = F6(
-	function (func, ra, rb, rc, rd, re) {
-		var _p7 = {ctor: '_Tuple5', _0: ra, _1: rb, _2: rc, _3: rd, _4: re};
-		if (_p7._0.ctor === 'Ok') {
-			if (_p7._1.ctor === 'Ok') {
-				if (_p7._2.ctor === 'Ok') {
-					if (_p7._3.ctor === 'Ok') {
-						if (_p7._4.ctor === 'Ok') {
-							return _elm_lang$core$Result$Ok(
-								A5(func, _p7._0._0, _p7._1._0, _p7._2._0, _p7._3._0, _p7._4._0));
-						} else {
-							return _elm_lang$core$Result$Err(_p7._4._0);
-						}
-					} else {
-						return _elm_lang$core$Result$Err(_p7._3._0);
-					}
-				} else {
-					return _elm_lang$core$Result$Err(_p7._2._0);
-				}
-			} else {
-				return _elm_lang$core$Result$Err(_p7._1._0);
-			}
-		} else {
-			return _elm_lang$core$Result$Err(_p7._0._0);
-		}
-	});
-var _elm_lang$core$Result$mapError = F2(
-	function (f, result) {
-		var _p8 = result;
-		if (_p8.ctor === 'Ok') {
-			return _elm_lang$core$Result$Ok(_p8._0);
-		} else {
-			return _elm_lang$core$Result$Err(
-				f(_p8._0));
-		}
-	});
-var _elm_lang$core$Result$fromMaybe = F2(
-	function (err, maybe) {
-		var _p9 = maybe;
-		if (_p9.ctor === 'Just') {
-			return _elm_lang$core$Result$Ok(_p9._0);
-		} else {
-			return _elm_lang$core$Result$Err(err);
-		}
-	});
 var _elm_lang$core$String$fromList = _elm_lang$core$Native_String.fromList;
 var _elm_lang$core$String$toList = _elm_lang$core$Native_String.toList;
 var _elm_lang$core$String$toFloat = _elm_lang$core$Native_String.toFloat;
@@ -2255,6 +2257,931 @@ var _elm_lang$core$String$fromChar = function ($char) {
 	return A2(_elm_lang$core$String$cons, $char, '');
 };
 var _elm_lang$core$String$isEmpty = _elm_lang$core$Native_String.isEmpty;
+var _elm_lang$core$Tuple$mapSecond = F2(
+	function (func, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '_Tuple2',
+			_0: _p1._0,
+			_1: func(_p1._1)
+		};
+	});
+var _elm_lang$core$Tuple$mapFirst = F2(
+	function (func, _p2) {
+		var _p3 = _p2;
+		return {
+			ctor: '_Tuple2',
+			_0: func(_p3._0),
+			_1: _p3._1
+		};
+	});
+var _elm_lang$core$Tuple$second = function (_p4) {
+	var _p5 = _p4;
+	return _p5._1;
+};
+var _elm_lang$core$Tuple$first = function (_p6) {
+	var _p7 = _p6;
+	return _p7._0;
+};
+//import //
+
+var _elm_lang$core$Native_Platform = function() {
+
+
+// PROGRAMS
+
+function program(impl)
+{
+	return function(flagDecoder)
+	{
+		return function(object, moduleName)
+		{
+			object['worker'] = function worker(flags)
+			{
+				if (typeof flags !== 'undefined')
+				{
+					throw new Error(
+						'The `' + moduleName + '` module does not need flags.\n'
+						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
+					);
+				}
+
+				return initialize(
+					impl.init,
+					impl.update,
+					impl.subscriptions,
+					renderer
+				);
+			};
+		};
+	};
+}
+
+function programWithFlags(impl)
+{
+	return function(flagDecoder)
+	{
+		return function(object, moduleName)
+		{
+			object['worker'] = function worker(flags)
+			{
+				if (typeof flagDecoder === 'undefined')
+				{
+					throw new Error(
+						'Are you trying to sneak a Never value into Elm? Trickster!\n'
+						+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
+						+ 'Use `program` instead if you do not want flags.'
+					);
+				}
+
+				var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+				if (result.ctor === 'Err')
+				{
+					throw new Error(
+						moduleName + '.worker(...) was called with an unexpected argument.\n'
+						+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
+						+ result._0
+					);
+				}
+
+				return initialize(
+					impl.init(result._0),
+					impl.update,
+					impl.subscriptions,
+					renderer
+				);
+			};
+		};
+	};
+}
+
+function renderer(enqueue, _)
+{
+	return function(_) {};
+}
+
+
+// HTML TO PROGRAM
+
+function htmlToProgram(vnode)
+{
+	var emptyBag = batch(_elm_lang$core$Native_List.Nil);
+	var noChange = _elm_lang$core$Native_Utils.Tuple2(
+		_elm_lang$core$Native_Utils.Tuple0,
+		emptyBag
+	);
+
+	return _elm_lang$virtual_dom$VirtualDom$program({
+		init: noChange,
+		view: function(model) { return main; },
+		update: F2(function(msg, model) { return noChange; }),
+		subscriptions: function (model) { return emptyBag; }
+	});
+}
+
+
+// INITIALIZE A PROGRAM
+
+function initialize(init, update, subscriptions, renderer)
+{
+	// ambient state
+	var managers = {};
+	var updateView;
+
+	// init and update state in main process
+	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+		var model = init._0;
+		updateView = renderer(enqueue, model);
+		var cmds = init._1;
+		var subs = subscriptions(model);
+		dispatchEffects(managers, cmds, subs);
+		callback(_elm_lang$core$Native_Scheduler.succeed(model));
+	});
+
+	function onMessage(msg, model)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+			var results = A2(update, msg, model);
+			model = results._0;
+			updateView(model);
+			var cmds = results._1;
+			var subs = subscriptions(model);
+			dispatchEffects(managers, cmds, subs);
+			callback(_elm_lang$core$Native_Scheduler.succeed(model));
+		});
+	}
+
+	var mainProcess = spawnLoop(initApp, onMessage);
+
+	function enqueue(msg)
+	{
+		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
+	}
+
+	var ports = setupEffects(managers, enqueue);
+
+	return ports ? { ports: ports } : {};
+}
+
+
+// EFFECT MANAGERS
+
+var effectManagers = {};
+
+function setupEffects(managers, callback)
+{
+	var ports;
+
+	// setup all necessary effect managers
+	for (var key in effectManagers)
+	{
+		var manager = effectManagers[key];
+
+		if (manager.isForeign)
+		{
+			ports = ports || {};
+			ports[key] = manager.tag === 'cmd'
+				? setupOutgoingPort(key)
+				: setupIncomingPort(key, callback);
+		}
+
+		managers[key] = makeManager(manager, callback);
+	}
+
+	return ports;
+}
+
+function makeManager(info, callback)
+{
+	var router = {
+		main: callback,
+		self: undefined
+	};
+
+	var tag = info.tag;
+	var onEffects = info.onEffects;
+	var onSelfMsg = info.onSelfMsg;
+
+	function onMessage(msg, state)
+	{
+		if (msg.ctor === 'self')
+		{
+			return A3(onSelfMsg, router, msg._0, state);
+		}
+
+		var fx = msg._0;
+		switch (tag)
+		{
+			case 'cmd':
+				return A3(onEffects, router, fx.cmds, state);
+
+			case 'sub':
+				return A3(onEffects, router, fx.subs, state);
+
+			case 'fx':
+				return A4(onEffects, router, fx.cmds, fx.subs, state);
+		}
+	}
+
+	var process = spawnLoop(info.init, onMessage);
+	router.self = process;
+	return process;
+}
+
+function sendToApp(router, msg)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		router.main(msg);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function sendToSelf(router, msg)
+{
+	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
+		ctor: 'self',
+		_0: msg
+	});
+}
+
+
+// HELPER for STATEFUL LOOPS
+
+function spawnLoop(init, onMessage)
+{
+	var andThen = _elm_lang$core$Native_Scheduler.andThen;
+
+	function loop(state)
+	{
+		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
+			return onMessage(msg, state);
+		});
+		return A2(andThen, loop, handleMsg);
+	}
+
+	var task = A2(andThen, loop, init);
+
+	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
+}
+
+
+// BAGS
+
+function leaf(home)
+{
+	return function(value)
+	{
+		return {
+			type: 'leaf',
+			home: home,
+			value: value
+		};
+	};
+}
+
+function batch(list)
+{
+	return {
+		type: 'node',
+		branches: list
+	};
+}
+
+function map(tagger, bag)
+{
+	return {
+		type: 'map',
+		tagger: tagger,
+		tree: bag
+	}
+}
+
+
+// PIPE BAGS INTO EFFECT MANAGERS
+
+function dispatchEffects(managers, cmdBag, subBag)
+{
+	var effectsDict = {};
+	gatherEffects(true, cmdBag, effectsDict, null);
+	gatherEffects(false, subBag, effectsDict, null);
+
+	for (var home in managers)
+	{
+		var fx = home in effectsDict
+			? effectsDict[home]
+			: {
+				cmds: _elm_lang$core$Native_List.Nil,
+				subs: _elm_lang$core$Native_List.Nil
+			};
+
+		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
+	}
+}
+
+function gatherEffects(isCmd, bag, effectsDict, taggers)
+{
+	switch (bag.type)
+	{
+		case 'leaf':
+			var home = bag.home;
+			var effect = toEffect(isCmd, home, taggers, bag.value);
+			effectsDict[home] = insert(isCmd, effect, effectsDict[home]);
+			return;
+
+		case 'node':
+			var list = bag.branches;
+			while (list.ctor !== '[]')
+			{
+				gatherEffects(isCmd, list._0, effectsDict, taggers);
+				list = list._1;
+			}
+			return;
+
+		case 'map':
+			gatherEffects(isCmd, bag.tree, effectsDict, {
+				tagger: bag.tagger,
+				rest: taggers
+			});
+			return;
+	}
+}
+
+function toEffect(isCmd, home, taggers, value)
+{
+	function applyTaggers(x)
+	{
+		var temp = taggers;
+		while (temp)
+		{
+			x = temp.tagger(x);
+			temp = temp.rest;
+		}
+		return x;
+	}
+
+	var map = isCmd
+		? effectManagers[home].cmdMap
+		: effectManagers[home].subMap;
+
+	return A2(map, applyTaggers, value)
+}
+
+function insert(isCmd, newEffect, effects)
+{
+	effects = effects || {
+		cmds: _elm_lang$core$Native_List.Nil,
+		subs: _elm_lang$core$Native_List.Nil
+	};
+	if (isCmd)
+	{
+		effects.cmds = _elm_lang$core$Native_List.Cons(newEffect, effects.cmds);
+		return effects;
+	}
+	effects.subs = _elm_lang$core$Native_List.Cons(newEffect, effects.subs);
+	return effects;
+}
+
+
+// PORTS
+
+function checkPortName(name)
+{
+	if (name in effectManagers)
+	{
+		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
+	}
+}
+
+
+// OUTGOING PORTS
+
+function outgoingPort(name, converter)
+{
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'cmd',
+		cmdMap: outgoingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var outgoingPortMap = F2(function cmdMap(tagger, value) {
+	return value;
+});
+
+function setupOutgoingPort(name)
+{
+	var subs = [];
+	var converter = effectManagers[name].converter;
+
+	// CREATE MANAGER
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function onEffects(router, cmdList, state)
+	{
+		while (cmdList.ctor !== '[]')
+		{
+			// grab a separate reference to subs in case unsubscribe is called
+			var currentSubs = subs;
+			var value = converter(cmdList._0);
+			for (var i = 0; i < currentSubs.length; i++)
+			{
+				currentSubs[i](value);
+			}
+			cmdList = cmdList._1;
+		}
+		return init;
+	}
+
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
+
+	// PUBLIC API
+
+	function subscribe(callback)
+	{
+		subs.push(callback);
+	}
+
+	function unsubscribe(callback)
+	{
+		// copy subs into a new array in case unsubscribe is called within a
+		// subscribed callback
+		subs = subs.slice();
+		var index = subs.indexOf(callback);
+		if (index >= 0)
+		{
+			subs.splice(index, 1);
+		}
+	}
+
+	return {
+		subscribe: subscribe,
+		unsubscribe: unsubscribe
+	};
+}
+
+
+// INCOMING PORTS
+
+function incomingPort(name, converter)
+{
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'sub',
+		subMap: incomingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var incomingPortMap = F2(function subMap(tagger, finalTagger)
+{
+	return function(value)
+	{
+		return tagger(finalTagger(value));
+	};
+});
+
+function setupIncomingPort(name, callback)
+{
+	var sentBeforeInit = [];
+	var subs = _elm_lang$core$Native_List.Nil;
+	var converter = effectManagers[name].converter;
+	var currentOnEffects = preInitOnEffects;
+	var currentSend = preInitSend;
+
+	// CREATE MANAGER
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function preInitOnEffects(router, subList, state)
+	{
+		var postInitResult = postInitOnEffects(router, subList, state);
+
+		for(var i = 0; i < sentBeforeInit.length; i++)
+		{
+			postInitSend(sentBeforeInit[i]);
+		}
+
+		sentBeforeInit = null; // to release objects held in queue
+		currentSend = postInitSend;
+		currentOnEffects = postInitOnEffects;
+		return postInitResult;
+	}
+
+	function postInitOnEffects(router, subList, state)
+	{
+		subs = subList;
+		return init;
+	}
+
+	function onEffects(router, subList, state)
+	{
+		return currentOnEffects(router, subList, state);
+	}
+
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
+
+	// PUBLIC API
+
+	function preInitSend(value)
+	{
+		sentBeforeInit.push(value);
+	}
+
+	function postInitSend(value)
+	{
+		var temp = subs;
+		while (temp.ctor !== '[]')
+		{
+			callback(temp._0(value));
+			temp = temp._1;
+		}
+	}
+
+	function send(incomingValue)
+	{
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		if (result.ctor === 'Err')
+		{
+			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
+		}
+
+		currentSend(result._0);
+	}
+
+	return { send: send };
+}
+
+return {
+	// routers
+	sendToApp: F2(sendToApp),
+	sendToSelf: F2(sendToSelf),
+
+	// global setup
+	effectManagers: effectManagers,
+	outgoingPort: outgoingPort,
+	incomingPort: incomingPort,
+
+	htmlToProgram: htmlToProgram,
+	program: program,
+	programWithFlags: programWithFlags,
+	initialize: initialize,
+
+	// effect bags
+	leaf: leaf,
+	batch: batch,
+	map: F2(map)
+};
+
+}();
+//import Native.Utils //
+
+var _elm_lang$core$Native_Scheduler = function() {
+
+var MAX_STEPS = 10000;
+
+
+// TASKS
+
+function succeed(value)
+{
+	return {
+		ctor: '_Task_succeed',
+		value: value
+	};
+}
+
+function fail(error)
+{
+	return {
+		ctor: '_Task_fail',
+		value: error
+	};
+}
+
+function nativeBinding(callback)
+{
+	return {
+		ctor: '_Task_nativeBinding',
+		callback: callback,
+		cancel: null
+	};
+}
+
+function andThen(callback, task)
+{
+	return {
+		ctor: '_Task_andThen',
+		callback: callback,
+		task: task
+	};
+}
+
+function onError(callback, task)
+{
+	return {
+		ctor: '_Task_onError',
+		callback: callback,
+		task: task
+	};
+}
+
+function receive(callback)
+{
+	return {
+		ctor: '_Task_receive',
+		callback: callback
+	};
+}
+
+
+// PROCESSES
+
+function rawSpawn(task)
+{
+	var process = {
+		ctor: '_Process',
+		id: _elm_lang$core$Native_Utils.guid(),
+		root: task,
+		stack: null,
+		mailbox: []
+	};
+
+	enqueue(process);
+
+	return process;
+}
+
+function spawn(task)
+{
+	return nativeBinding(function(callback) {
+		var process = rawSpawn(task);
+		callback(succeed(process));
+	});
+}
+
+function rawSend(process, msg)
+{
+	process.mailbox.push(msg);
+	enqueue(process);
+}
+
+function send(process, msg)
+{
+	return nativeBinding(function(callback) {
+		rawSend(process, msg);
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function kill(process)
+{
+	return nativeBinding(function(callback) {
+		var root = process.root;
+		if (root.ctor === '_Task_nativeBinding' && root.cancel)
+		{
+			root.cancel();
+		}
+
+		process.root = null;
+
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function sleep(time)
+{
+	return nativeBinding(function(callback) {
+		var id = setTimeout(function() {
+			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+		}, time);
+
+		return function() { clearTimeout(id); };
+	});
+}
+
+
+// STEP PROCESSES
+
+function step(numSteps, process)
+{
+	while (numSteps < MAX_STEPS)
+	{
+		var ctor = process.root.ctor;
+
+		if (ctor === '_Task_succeed')
+		{
+			while (process.stack && process.stack.ctor === '_Task_onError')
+			{
+				process.stack = process.stack.rest;
+			}
+			if (process.stack === null)
+			{
+				break;
+			}
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_fail')
+		{
+			while (process.stack && process.stack.ctor === '_Task_andThen')
+			{
+				process.stack = process.stack.rest;
+			}
+			if (process.stack === null)
+			{
+				break;
+			}
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_andThen')
+		{
+			process.stack = {
+				ctor: '_Task_andThen',
+				callback: process.root.callback,
+				rest: process.stack
+			};
+			process.root = process.root.task;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_onError')
+		{
+			process.stack = {
+				ctor: '_Task_onError',
+				callback: process.root.callback,
+				rest: process.stack
+			};
+			process.root = process.root.task;
+			++numSteps;
+			continue;
+		}
+
+		if (ctor === '_Task_nativeBinding')
+		{
+			process.root.cancel = process.root.callback(function(newRoot) {
+				process.root = newRoot;
+				enqueue(process);
+			});
+
+			break;
+		}
+
+		if (ctor === '_Task_receive')
+		{
+			var mailbox = process.mailbox;
+			if (mailbox.length === 0)
+			{
+				break;
+			}
+
+			process.root = process.root.callback(mailbox.shift());
+			++numSteps;
+			continue;
+		}
+
+		throw new Error(ctor);
+	}
+
+	if (numSteps < MAX_STEPS)
+	{
+		return numSteps + 1;
+	}
+	enqueue(process);
+
+	return numSteps;
+}
+
+
+// WORK QUEUE
+
+var working = false;
+var workQueue = [];
+
+function enqueue(process)
+{
+	workQueue.push(process);
+
+	if (!working)
+	{
+		setTimeout(work, 0);
+		working = true;
+	}
+}
+
+function work()
+{
+	var numSteps = 0;
+	var process;
+	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
+	{
+		if (process.root)
+		{
+			numSteps = step(numSteps, process);
+		}
+	}
+	if (!process)
+	{
+		working = false;
+		return;
+	}
+	setTimeout(work, 0);
+}
+
+
+return {
+	succeed: succeed,
+	fail: fail,
+	nativeBinding: nativeBinding,
+	andThen: F2(andThen),
+	onError: F2(onError),
+	receive: receive,
+
+	spawn: spawn,
+	kill: kill,
+	sleep: sleep,
+	send: F2(send),
+
+	rawSpawn: rawSpawn,
+	rawSend: rawSend
+};
+
+}();var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
+var _elm_lang$core$Platform_Cmd$none = _elm_lang$core$Platform_Cmd$batch(
+	{ctor: '[]'});
+var _elm_lang$core$Platform_Cmd_ops = _elm_lang$core$Platform_Cmd_ops || {};
+_elm_lang$core$Platform_Cmd_ops['!'] = F2(
+	function (model, commands) {
+		return {
+			ctor: '_Tuple2',
+			_0: model,
+			_1: _elm_lang$core$Platform_Cmd$batch(commands)
+		};
+	});
+var _elm_lang$core$Platform_Cmd$map = _elm_lang$core$Native_Platform.map;
+var _elm_lang$core$Platform_Cmd$Cmd = {ctor: 'Cmd'};
+var _elm_lang$core$Platform_Sub$batch = _elm_lang$core$Native_Platform.batch;
+var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
+	{ctor: '[]'});
+var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
+var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
+var _elm_lang$core$Platform$hack = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Platform$sendToSelf = _elm_lang$core$Native_Platform.sendToSelf;
+var _elm_lang$core$Platform$sendToApp = _elm_lang$core$Native_Platform.sendToApp;
+var _elm_lang$core$Platform$programWithFlags = _elm_lang$core$Native_Platform.programWithFlags;
+var _elm_lang$core$Platform$program = _elm_lang$core$Native_Platform.program;
+var _elm_lang$core$Platform$Program = {ctor: 'Program'};
+var _elm_lang$core$Platform$Task = {ctor: 'Task'};
+var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
+var _elm_lang$core$Platform$Router = {ctor: 'Router'};
+var _Chadtech$elm_bool_extra$Bool_Extra$anyPass = F2(
+	function (ps, x) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (p, acc) {
+					return acc || p(x);
+				}),
+			false,
+			ps);
+	});
+var _Chadtech$elm_bool_extra$Bool_Extra$allPass = F2(
+	function (ps, x) {
+		return A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (p, acc) {
+					return acc && p(x);
+				}),
+			true,
+			ps);
+	});
+var _Chadtech$elm_bool_extra$Bool_Extra$ternary = F3(
+	function (a, b, condition) {
+		return condition ? a : b;
+	});
+var _Chadtech$elm_bool_extra$Bool_Extra$any = _elm_lang$core$List$any(_elm_lang$core$Basics$identity);
+var _Chadtech$elm_bool_extra$Bool_Extra$none = _elm_lang$core$List$all(_elm_lang$core$Basics$not);
+var _Chadtech$elm_bool_extra$Bool_Extra$all = _elm_lang$core$List$all(_elm_lang$core$Basics$identity);
+var _Chadtech$elm_bool_extra$Bool_Extra$notAll = function (_p0) {
+	return !_Chadtech$elm_bool_extra$Bool_Extra$all(_p0);
+};
 var _elm_lang$core$Dict$foldr = F3(
 	function (f, acc, t) {
 		foldr:
@@ -3301,901 +4228,6 @@ var _elm_lang$core$Set$partition = F2(
 			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
 		};
 	});
-var _elm_lang$core$Tuple$mapSecond = F2(
-	function (func, _p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '_Tuple2',
-			_0: _p1._0,
-			_1: func(_p1._1)
-		};
-	});
-var _elm_lang$core$Tuple$mapFirst = F2(
-	function (func, _p2) {
-		var _p3 = _p2;
-		return {
-			ctor: '_Tuple2',
-			_0: func(_p3._0),
-			_1: _p3._1
-		};
-	});
-var _elm_lang$core$Tuple$second = function (_p4) {
-	var _p5 = _p4;
-	return _p5._1;
-};
-var _elm_lang$core$Tuple$first = function (_p6) {
-	var _p7 = _p6;
-	return _p7._0;
-};
-var _elm_lang$core$Debug$crash = _elm_lang$core$Native_Debug.crash;
-var _elm_lang$core$Debug$log = _elm_lang$core$Native_Debug.log;
-//import //
-
-var _elm_lang$core$Native_Platform = function() {
-
-
-// PROGRAMS
-
-function program(impl)
-{
-	return function(flagDecoder)
-	{
-		return function(object, moduleName)
-		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flags !== 'undefined')
-				{
-					throw new Error(
-						'The `' + moduleName + '` module does not need flags.\n'
-						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
-					);
-				}
-
-				return initialize(
-					impl.init,
-					impl.update,
-					impl.subscriptions,
-					renderer
-				);
-			};
-		};
-	};
-}
-
-function programWithFlags(impl)
-{
-	return function(flagDecoder)
-	{
-		return function(object, moduleName)
-		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flagDecoder === 'undefined')
-				{
-					throw new Error(
-						'Are you trying to sneak a Never value into Elm? Trickster!\n'
-						+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
-						+ 'Use `program` instead if you do not want flags.'
-					);
-				}
-
-				var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
-				if (result.ctor === 'Err')
-				{
-					throw new Error(
-						moduleName + '.worker(...) was called with an unexpected argument.\n'
-						+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
-						+ result._0
-					);
-				}
-
-				return initialize(
-					impl.init(result._0),
-					impl.update,
-					impl.subscriptions,
-					renderer
-				);
-			};
-		};
-	};
-}
-
-function renderer(enqueue, _)
-{
-	return function(_) {};
-}
-
-
-// HTML TO PROGRAM
-
-function htmlToProgram(vnode)
-{
-	var emptyBag = batch(_elm_lang$core$Native_List.Nil);
-	var noChange = _elm_lang$core$Native_Utils.Tuple2(
-		_elm_lang$core$Native_Utils.Tuple0,
-		emptyBag
-	);
-
-	return _elm_lang$virtual_dom$VirtualDom$program({
-		init: noChange,
-		view: function(model) { return main; },
-		update: F2(function(msg, model) { return noChange; }),
-		subscriptions: function (model) { return emptyBag; }
-	});
-}
-
-
-// INITIALIZE A PROGRAM
-
-function initialize(init, update, subscriptions, renderer)
-{
-	// ambient state
-	var managers = {};
-	var updateView;
-
-	// init and update state in main process
-	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-		var model = init._0;
-		updateView = renderer(enqueue, model);
-		var cmds = init._1;
-		var subs = subscriptions(model);
-		dispatchEffects(managers, cmds, subs);
-		callback(_elm_lang$core$Native_Scheduler.succeed(model));
-	});
-
-	function onMessage(msg, model)
-	{
-		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-			var results = A2(update, msg, model);
-			model = results._0;
-			updateView(model);
-			var cmds = results._1;
-			var subs = subscriptions(model);
-			dispatchEffects(managers, cmds, subs);
-			callback(_elm_lang$core$Native_Scheduler.succeed(model));
-		});
-	}
-
-	var mainProcess = spawnLoop(initApp, onMessage);
-
-	function enqueue(msg)
-	{
-		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
-	}
-
-	var ports = setupEffects(managers, enqueue);
-
-	return ports ? { ports: ports } : {};
-}
-
-
-// EFFECT MANAGERS
-
-var effectManagers = {};
-
-function setupEffects(managers, callback)
-{
-	var ports;
-
-	// setup all necessary effect managers
-	for (var key in effectManagers)
-	{
-		var manager = effectManagers[key];
-
-		if (manager.isForeign)
-		{
-			ports = ports || {};
-			ports[key] = manager.tag === 'cmd'
-				? setupOutgoingPort(key)
-				: setupIncomingPort(key, callback);
-		}
-
-		managers[key] = makeManager(manager, callback);
-	}
-
-	return ports;
-}
-
-function makeManager(info, callback)
-{
-	var router = {
-		main: callback,
-		self: undefined
-	};
-
-	var tag = info.tag;
-	var onEffects = info.onEffects;
-	var onSelfMsg = info.onSelfMsg;
-
-	function onMessage(msg, state)
-	{
-		if (msg.ctor === 'self')
-		{
-			return A3(onSelfMsg, router, msg._0, state);
-		}
-
-		var fx = msg._0;
-		switch (tag)
-		{
-			case 'cmd':
-				return A3(onEffects, router, fx.cmds, state);
-
-			case 'sub':
-				return A3(onEffects, router, fx.subs, state);
-
-			case 'fx':
-				return A4(onEffects, router, fx.cmds, fx.subs, state);
-		}
-	}
-
-	var process = spawnLoop(info.init, onMessage);
-	router.self = process;
-	return process;
-}
-
-function sendToApp(router, msg)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
-	{
-		router.main(msg);
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function sendToSelf(router, msg)
-{
-	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
-		ctor: 'self',
-		_0: msg
-	});
-}
-
-
-// HELPER for STATEFUL LOOPS
-
-function spawnLoop(init, onMessage)
-{
-	var andThen = _elm_lang$core$Native_Scheduler.andThen;
-
-	function loop(state)
-	{
-		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
-			return onMessage(msg, state);
-		});
-		return A2(andThen, loop, handleMsg);
-	}
-
-	var task = A2(andThen, loop, init);
-
-	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
-}
-
-
-// BAGS
-
-function leaf(home)
-{
-	return function(value)
-	{
-		return {
-			type: 'leaf',
-			home: home,
-			value: value
-		};
-	};
-}
-
-function batch(list)
-{
-	return {
-		type: 'node',
-		branches: list
-	};
-}
-
-function map(tagger, bag)
-{
-	return {
-		type: 'map',
-		tagger: tagger,
-		tree: bag
-	}
-}
-
-
-// PIPE BAGS INTO EFFECT MANAGERS
-
-function dispatchEffects(managers, cmdBag, subBag)
-{
-	var effectsDict = {};
-	gatherEffects(true, cmdBag, effectsDict, null);
-	gatherEffects(false, subBag, effectsDict, null);
-
-	for (var home in managers)
-	{
-		var fx = home in effectsDict
-			? effectsDict[home]
-			: {
-				cmds: _elm_lang$core$Native_List.Nil,
-				subs: _elm_lang$core$Native_List.Nil
-			};
-
-		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
-	}
-}
-
-function gatherEffects(isCmd, bag, effectsDict, taggers)
-{
-	switch (bag.type)
-	{
-		case 'leaf':
-			var home = bag.home;
-			var effect = toEffect(isCmd, home, taggers, bag.value);
-			effectsDict[home] = insert(isCmd, effect, effectsDict[home]);
-			return;
-
-		case 'node':
-			var list = bag.branches;
-			while (list.ctor !== '[]')
-			{
-				gatherEffects(isCmd, list._0, effectsDict, taggers);
-				list = list._1;
-			}
-			return;
-
-		case 'map':
-			gatherEffects(isCmd, bag.tree, effectsDict, {
-				tagger: bag.tagger,
-				rest: taggers
-			});
-			return;
-	}
-}
-
-function toEffect(isCmd, home, taggers, value)
-{
-	function applyTaggers(x)
-	{
-		var temp = taggers;
-		while (temp)
-		{
-			x = temp.tagger(x);
-			temp = temp.rest;
-		}
-		return x;
-	}
-
-	var map = isCmd
-		? effectManagers[home].cmdMap
-		: effectManagers[home].subMap;
-
-	return A2(map, applyTaggers, value)
-}
-
-function insert(isCmd, newEffect, effects)
-{
-	effects = effects || {
-		cmds: _elm_lang$core$Native_List.Nil,
-		subs: _elm_lang$core$Native_List.Nil
-	};
-	if (isCmd)
-	{
-		effects.cmds = _elm_lang$core$Native_List.Cons(newEffect, effects.cmds);
-		return effects;
-	}
-	effects.subs = _elm_lang$core$Native_List.Cons(newEffect, effects.subs);
-	return effects;
-}
-
-
-// PORTS
-
-function checkPortName(name)
-{
-	if (name in effectManagers)
-	{
-		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
-	}
-}
-
-
-// OUTGOING PORTS
-
-function outgoingPort(name, converter)
-{
-	checkPortName(name);
-	effectManagers[name] = {
-		tag: 'cmd',
-		cmdMap: outgoingPortMap,
-		converter: converter,
-		isForeign: true
-	};
-	return leaf(name);
-}
-
-var outgoingPortMap = F2(function cmdMap(tagger, value) {
-	return value;
-});
-
-function setupOutgoingPort(name)
-{
-	var subs = [];
-	var converter = effectManagers[name].converter;
-
-	// CREATE MANAGER
-
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
-
-	function onEffects(router, cmdList, state)
-	{
-		while (cmdList.ctor !== '[]')
-		{
-			// grab a separate reference to subs in case unsubscribe is called
-			var currentSubs = subs;
-			var value = converter(cmdList._0);
-			for (var i = 0; i < currentSubs.length; i++)
-			{
-				currentSubs[i](value);
-			}
-			cmdList = cmdList._1;
-		}
-		return init;
-	}
-
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
-
-	// PUBLIC API
-
-	function subscribe(callback)
-	{
-		subs.push(callback);
-	}
-
-	function unsubscribe(callback)
-	{
-		// copy subs into a new array in case unsubscribe is called within a
-		// subscribed callback
-		subs = subs.slice();
-		var index = subs.indexOf(callback);
-		if (index >= 0)
-		{
-			subs.splice(index, 1);
-		}
-	}
-
-	return {
-		subscribe: subscribe,
-		unsubscribe: unsubscribe
-	};
-}
-
-
-// INCOMING PORTS
-
-function incomingPort(name, converter)
-{
-	checkPortName(name);
-	effectManagers[name] = {
-		tag: 'sub',
-		subMap: incomingPortMap,
-		converter: converter,
-		isForeign: true
-	};
-	return leaf(name);
-}
-
-var incomingPortMap = F2(function subMap(tagger, finalTagger)
-{
-	return function(value)
-	{
-		return tagger(finalTagger(value));
-	};
-});
-
-function setupIncomingPort(name, callback)
-{
-	var sentBeforeInit = [];
-	var subs = _elm_lang$core$Native_List.Nil;
-	var converter = effectManagers[name].converter;
-	var currentOnEffects = preInitOnEffects;
-	var currentSend = preInitSend;
-
-	// CREATE MANAGER
-
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
-
-	function preInitOnEffects(router, subList, state)
-	{
-		var postInitResult = postInitOnEffects(router, subList, state);
-
-		for(var i = 0; i < sentBeforeInit.length; i++)
-		{
-			postInitSend(sentBeforeInit[i]);
-		}
-
-		sentBeforeInit = null; // to release objects held in queue
-		currentSend = postInitSend;
-		currentOnEffects = postInitOnEffects;
-		return postInitResult;
-	}
-
-	function postInitOnEffects(router, subList, state)
-	{
-		subs = subList;
-		return init;
-	}
-
-	function onEffects(router, subList, state)
-	{
-		return currentOnEffects(router, subList, state);
-	}
-
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
-
-	// PUBLIC API
-
-	function preInitSend(value)
-	{
-		sentBeforeInit.push(value);
-	}
-
-	function postInitSend(value)
-	{
-		var temp = subs;
-		while (temp.ctor !== '[]')
-		{
-			callback(temp._0(value));
-			temp = temp._1;
-		}
-	}
-
-	function send(incomingValue)
-	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
-		if (result.ctor === 'Err')
-		{
-			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
-		}
-
-		currentSend(result._0);
-	}
-
-	return { send: send };
-}
-
-return {
-	// routers
-	sendToApp: F2(sendToApp),
-	sendToSelf: F2(sendToSelf),
-
-	// global setup
-	effectManagers: effectManagers,
-	outgoingPort: outgoingPort,
-	incomingPort: incomingPort,
-
-	htmlToProgram: htmlToProgram,
-	program: program,
-	programWithFlags: programWithFlags,
-	initialize: initialize,
-
-	// effect bags
-	leaf: leaf,
-	batch: batch,
-	map: F2(map)
-};
-
-}();
-//import Native.Utils //
-
-var _elm_lang$core$Native_Scheduler = function() {
-
-var MAX_STEPS = 10000;
-
-
-// TASKS
-
-function succeed(value)
-{
-	return {
-		ctor: '_Task_succeed',
-		value: value
-	};
-}
-
-function fail(error)
-{
-	return {
-		ctor: '_Task_fail',
-		value: error
-	};
-}
-
-function nativeBinding(callback)
-{
-	return {
-		ctor: '_Task_nativeBinding',
-		callback: callback,
-		cancel: null
-	};
-}
-
-function andThen(callback, task)
-{
-	return {
-		ctor: '_Task_andThen',
-		callback: callback,
-		task: task
-	};
-}
-
-function onError(callback, task)
-{
-	return {
-		ctor: '_Task_onError',
-		callback: callback,
-		task: task
-	};
-}
-
-function receive(callback)
-{
-	return {
-		ctor: '_Task_receive',
-		callback: callback
-	};
-}
-
-
-// PROCESSES
-
-function rawSpawn(task)
-{
-	var process = {
-		ctor: '_Process',
-		id: _elm_lang$core$Native_Utils.guid(),
-		root: task,
-		stack: null,
-		mailbox: []
-	};
-
-	enqueue(process);
-
-	return process;
-}
-
-function spawn(task)
-{
-	return nativeBinding(function(callback) {
-		var process = rawSpawn(task);
-		callback(succeed(process));
-	});
-}
-
-function rawSend(process, msg)
-{
-	process.mailbox.push(msg);
-	enqueue(process);
-}
-
-function send(process, msg)
-{
-	return nativeBinding(function(callback) {
-		rawSend(process, msg);
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function kill(process)
-{
-	return nativeBinding(function(callback) {
-		var root = process.root;
-		if (root.ctor === '_Task_nativeBinding' && root.cancel)
-		{
-			root.cancel();
-		}
-
-		process.root = null;
-
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-	});
-}
-
-function sleep(time)
-{
-	return nativeBinding(function(callback) {
-		var id = setTimeout(function() {
-			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-		}, time);
-
-		return function() { clearTimeout(id); };
-	});
-}
-
-
-// STEP PROCESSES
-
-function step(numSteps, process)
-{
-	while (numSteps < MAX_STEPS)
-	{
-		var ctor = process.root.ctor;
-
-		if (ctor === '_Task_succeed')
-		{
-			while (process.stack && process.stack.ctor === '_Task_onError')
-			{
-				process.stack = process.stack.rest;
-			}
-			if (process.stack === null)
-			{
-				break;
-			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_fail')
-		{
-			while (process.stack && process.stack.ctor === '_Task_andThen')
-			{
-				process.stack = process.stack.rest;
-			}
-			if (process.stack === null)
-			{
-				break;
-			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_andThen')
-		{
-			process.stack = {
-				ctor: '_Task_andThen',
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_onError')
-		{
-			process.stack = {
-				ctor: '_Task_onError',
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (ctor === '_Task_nativeBinding')
-		{
-			process.root.cancel = process.root.callback(function(newRoot) {
-				process.root = newRoot;
-				enqueue(process);
-			});
-
-			break;
-		}
-
-		if (ctor === '_Task_receive')
-		{
-			var mailbox = process.mailbox;
-			if (mailbox.length === 0)
-			{
-				break;
-			}
-
-			process.root = process.root.callback(mailbox.shift());
-			++numSteps;
-			continue;
-		}
-
-		throw new Error(ctor);
-	}
-
-	if (numSteps < MAX_STEPS)
-	{
-		return numSteps + 1;
-	}
-	enqueue(process);
-
-	return numSteps;
-}
-
-
-// WORK QUEUE
-
-var working = false;
-var workQueue = [];
-
-function enqueue(process)
-{
-	workQueue.push(process);
-
-	if (!working)
-	{
-		setTimeout(work, 0);
-		working = true;
-	}
-}
-
-function work()
-{
-	var numSteps = 0;
-	var process;
-	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
-	{
-		if (process.root)
-		{
-			numSteps = step(numSteps, process);
-		}
-	}
-	if (!process)
-	{
-		working = false;
-		return;
-	}
-	setTimeout(work, 0);
-}
-
-
-return {
-	succeed: succeed,
-	fail: fail,
-	nativeBinding: nativeBinding,
-	andThen: F2(andThen),
-	onError: F2(onError),
-	receive: receive,
-
-	spawn: spawn,
-	kill: kill,
-	sleep: sleep,
-	send: F2(send),
-
-	rawSpawn: rawSpawn,
-	rawSend: rawSend
-};
-
-}();var _elm_lang$core$Platform_Cmd$batch = _elm_lang$core$Native_Platform.batch;
-var _elm_lang$core$Platform_Cmd$none = _elm_lang$core$Platform_Cmd$batch(
-	{ctor: '[]'});
-var _elm_lang$core$Platform_Cmd_ops = _elm_lang$core$Platform_Cmd_ops || {};
-_elm_lang$core$Platform_Cmd_ops['!'] = F2(
-	function (model, commands) {
-		return {
-			ctor: '_Tuple2',
-			_0: model,
-			_1: _elm_lang$core$Platform_Cmd$batch(commands)
-		};
-	});
-var _elm_lang$core$Platform_Cmd$map = _elm_lang$core$Native_Platform.map;
-var _elm_lang$core$Platform_Cmd$Cmd = {ctor: 'Cmd'};
-var _elm_lang$core$Platform_Sub$batch = _elm_lang$core$Native_Platform.batch;
-var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
-	{ctor: '[]'});
-var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
-var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
-var _elm_lang$core$Platform$hack = _elm_lang$core$Native_Scheduler.succeed;
-var _elm_lang$core$Platform$sendToSelf = _elm_lang$core$Native_Platform.sendToSelf;
-var _elm_lang$core$Platform$sendToApp = _elm_lang$core$Native_Platform.sendToApp;
-var _elm_lang$core$Platform$programWithFlags = _elm_lang$core$Native_Platform.programWithFlags;
-var _elm_lang$core$Platform$program = _elm_lang$core$Native_Platform.program;
-var _elm_lang$core$Platform$Program = {ctor: 'Program'};
-var _elm_lang$core$Platform$Task = {ctor: 'Task'};
-var _elm_lang$core$Platform$ProcessId = {ctor: 'ProcessId'};
-var _elm_lang$core$Platform$Router = {ctor: 'Router'};
 var _elm_community$list_extra$List_Extra$greedyGroupsOfWithStep = F3(
 	function (size, step, xs) {
 		var okayXs = _elm_lang$core$Native_Utils.cmp(
@@ -11457,9 +11489,25 @@ var _mdgriffith$stylish_elephants$Internal_Style$class = function (cls) {
 			return '.se.spacer';
 	}
 };
+var _mdgriffith$stylish_elephants$Internal_Style$lenToString = function (len) {
+	var _p1 = len;
+	if (_p1.ctor === 'Shrink') {
+		return 'content';
+	} else {
+		return 'fill';
+	}
+};
+var _mdgriffith$stylish_elephants$Internal_Style$dimensionToString = function (x) {
+	var _p2 = x;
+	if (_p2.ctor === 'Width') {
+		return 'width';
+	} else {
+		return 'height';
+	}
+};
 var _mdgriffith$stylish_elephants$Internal_Style$locationName = function (loc) {
-	var _p1 = loc;
-	switch (_p1.ctor) {
+	var _p3 = loc;
+	switch (_p3.ctor) {
 		case 'Above':
 			return '.above';
 		case 'Below':
@@ -11475,8 +11523,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$locationName = function (loc) {
 	}
 };
 var _mdgriffith$stylish_elephants$Internal_Style$contentName = function (desc) {
-	var _p2 = desc;
-	switch (_p2._0.ctor) {
+	var _p4 = desc;
+	switch (_p4._0.ctor) {
 		case 'Top':
 			return '.content-top';
 		case 'Bottom':
@@ -11492,8 +11540,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$contentName = function (desc) {
 	}
 };
 var _mdgriffith$stylish_elephants$Internal_Style$selfName = function (desc) {
-	var _p3 = desc;
-	switch (_p3._0.ctor) {
+	var _p5 = desc;
+	switch (_p5._0.ctor) {
 		case 'Top':
 			return '.self-top';
 		case 'Bottom':
@@ -11536,12 +11584,12 @@ var _mdgriffith$stylish_elephants$Internal_Style$Prop = F2(
 		return {ctor: 'Prop', _0: a, _1: b};
 	});
 var _mdgriffith$stylish_elephants$Internal_Style$makeImportant = function (rule) {
-	var _p4 = rule;
-	if (_p4.ctor === 'Prop') {
+	var _p6 = rule;
+	if (_p6.ctor === 'Prop') {
 		return A2(
 			_mdgriffith$stylish_elephants$Internal_Style$Prop,
-			_p4._0,
-			A2(_elm_lang$core$Basics_ops['++'], _p4._1, ' !important'));
+			_p6._0,
+			A2(_elm_lang$core$Basics_ops['++'], _p6._1, ' !important'));
 	} else {
 		return rule;
 	}
@@ -11586,9 +11634,9 @@ var _mdgriffith$stylish_elephants$Internal_Style$Below = {ctor: 'Below'};
 var _mdgriffith$stylish_elephants$Internal_Style$Above = {ctor: 'Above'};
 var _mdgriffith$stylish_elephants$Internal_Style$locations = function () {
 	var loc = _mdgriffith$stylish_elephants$Internal_Style$Above;
-	var _p5 = function () {
-		var _p6 = loc;
-		switch (_p6.ctor) {
+	var _p7 = function () {
+		var _p8 = loc;
+		switch (_p8.ctor) {
 			case 'Above':
 				return {ctor: '_Tuple0'};
 			case 'Below':
@@ -11629,6 +11677,44 @@ var _mdgriffith$stylish_elephants$Internal_Style$locations = function () {
 		}
 	};
 }();
+var _mdgriffith$stylish_elephants$Internal_Style$Fill = {ctor: 'Fill'};
+var _mdgriffith$stylish_elephants$Internal_Style$Shrink = {ctor: 'Shrink'};
+var _mdgriffith$stylish_elephants$Internal_Style$lengths = {
+	ctor: '::',
+	_0: _mdgriffith$stylish_elephants$Internal_Style$Shrink,
+	_1: {
+		ctor: '::',
+		_0: _mdgriffith$stylish_elephants$Internal_Style$Fill,
+		_1: {ctor: '[]'}
+	}
+};
+var _mdgriffith$stylish_elephants$Internal_Style$describeLength = F2(
+	function (dimension, lenValue) {
+		var name = _mdgriffith$stylish_elephants$Internal_Style$dimensionToString(dimension);
+		var renderLengthRule = function (len) {
+			return A2(
+				_mdgriffith$stylish_elephants$Internal_Style$Child,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'.',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						name,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'-',
+							_mdgriffith$stylish_elephants$Internal_Style$lenToString(len)))),
+				{
+					ctor: '::',
+					_0: lenValue(len),
+					_1: {ctor: '[]'}
+				});
+		};
+		return _mdgriffith$stylish_elephants$Internal_Style$Batch(
+			A2(_elm_lang$core$List$map, renderLengthRule, _mdgriffith$stylish_elephants$Internal_Style$lengths));
+	});
+var _mdgriffith$stylish_elephants$Internal_Style$Height = {ctor: 'Height'};
+var _mdgriffith$stylish_elephants$Internal_Style$Width = {ctor: 'Width'};
 var _mdgriffith$stylish_elephants$Internal_Style$Self = function (a) {
 	return {ctor: 'Self', _0: a};
 };
@@ -11668,9 +11754,9 @@ var _mdgriffith$stylish_elephants$Internal_Style$alignments = {
 };
 var _mdgriffith$stylish_elephants$Internal_Style$describeAlignment = function (values) {
 	var createDescription = function (alignment) {
-		var _p7 = values(alignment);
-		var content = _p7._0;
-		var indiv = _p7._1;
+		var _p9 = values(alignment);
+		var content = _p9._0;
+		var indiv = _p9._1;
 		return {
 			ctor: '::',
 			_0: A2(
@@ -11735,20 +11821,20 @@ var _mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate = F2(
 			});
 	});
 var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
-	function (_p8, rules) {
-		var _p9 = _p8;
-		var _p11 = _p9._0;
+	function (_p10, rules) {
+		var _p11 = _p10;
+		var _p13 = _p11._0;
 		var generateIntermediates = F2(
 			function (rule, rendered) {
-				var _p10 = rule;
-				switch (_p10.ctor) {
+				var _p12 = rule;
+				switch (_p12.ctor) {
 					case 'Prop':
 						return _elm_lang$core$Native_Utils.update(
 							rendered,
 							{
 								props: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: _p10._0, _1: _p10._1},
+									_0: {ctor: '_Tuple2', _0: _p12._0, _1: _p12._1},
 									_1: rendered.props
 								}
 							});
@@ -11765,15 +11851,15 @@ var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
 												'@supports (',
 												A2(
 													_elm_lang$core$Basics_ops['++'],
-													_p10._0._0,
+													_p12._0._0,
 													A2(
 														_elm_lang$core$Basics_ops['++'],
 														':',
 														A2(
 															_elm_lang$core$Basics_ops['++'],
-															_p10._0._1,
-															A2(_elm_lang$core$Basics_ops['++'], ') {', _p11.selector))))),
-											props: _p10._1,
+															_p12._0._1,
+															A2(_elm_lang$core$Basics_ops['++'], ') {', _p13.selector))))),
+											props: _p12._1,
 											closing: '\n}',
 											others: {ctor: '[]'}
 										}),
@@ -11792,10 +11878,10 @@ var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
 											_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate,
 											A2(
 												_elm_lang$core$Basics_ops['++'],
-												_p11.selector,
-												A2(_elm_lang$core$Basics_ops['++'], ' + ', _p10._0)),
+												_p13.selector,
+												A2(_elm_lang$core$Basics_ops['++'], ' + ', _p12._0)),
 											''),
-										_p10._1),
+										_p12._1),
 									_1: rendered.others
 								}
 							});
@@ -11811,10 +11897,10 @@ var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
 											_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate,
 											A2(
 												_elm_lang$core$Basics_ops['++'],
-												_p11.selector,
-												A2(_elm_lang$core$Basics_ops['++'], ' > ', _p10._0)),
+												_p13.selector,
+												A2(_elm_lang$core$Basics_ops['++'], ' > ', _p12._0)),
 											''),
-										_p10._1),
+										_p12._1),
 									_1: rendered.others
 								}
 							});
@@ -11828,9 +11914,9 @@ var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
 										_mdgriffith$stylish_elephants$Internal_Style$renderRules,
 										A2(
 											_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate,
-											A2(_elm_lang$core$Basics_ops['++'], _p11.selector, _p10._0),
+											A2(_elm_lang$core$Basics_ops['++'], _p13.selector, _p12._0),
 											''),
-										_p10._1),
+										_p12._1),
 									_1: rendered.others
 								}
 							});
@@ -11842,15 +11928,15 @@ var _mdgriffith$stylish_elephants$Internal_Style$renderRules = F2(
 									ctor: '::',
 									_0: A2(
 										_mdgriffith$stylish_elephants$Internal_Style$renderRules,
-										A2(_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate, _p11.selector, ''),
-										_p10._0),
+										A2(_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate, _p13.selector, ''),
+										_p12._0),
 									_1: rendered.others
 								}
 							});
 				}
 			});
 		return _mdgriffith$stylish_elephants$Internal_Style$Intermediate(
-			A3(_elm_lang$core$List$foldr, generateIntermediates, _p11, rules));
+			A3(_elm_lang$core$List$foldr, generateIntermediates, _p13, rules));
 	});
 var _mdgriffith$stylish_elephants$Internal_Style$render = function (classes) {
 	var renderValues = function (values) {
@@ -11859,24 +11945,24 @@ var _mdgriffith$stylish_elephants$Internal_Style$render = function (classes) {
 			'\n',
 			A2(
 				_elm_lang$core$List$map,
-				function (_p12) {
-					var _p13 = _p12;
+				function (_p14) {
+					var _p15 = _p14;
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						'  ',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							_p13._0,
+							_p15._0,
 							A2(
 								_elm_lang$core$Basics_ops['++'],
 								': ',
-								A2(_elm_lang$core$Basics_ops['++'], _p13._1, ';'))));
+								A2(_elm_lang$core$Basics_ops['++'], _p15._1, ';'))));
 				},
 				values));
 	};
 	var renderClass = function (rule) {
-		var _p14 = rule.props;
-		if (_p14.ctor === '[]') {
+		var _p16 = rule.props;
+		if (_p16.ctor === '[]') {
 			return '';
 		} else {
 			return A2(
@@ -11891,16 +11977,16 @@ var _mdgriffith$stylish_elephants$Internal_Style$render = function (classes) {
 						A2(_elm_lang$core$Basics_ops['++'], rule.closing, '\n}'))));
 		}
 	};
-	var renderIntermediate = function (_p15) {
-		var _p16 = _p15;
-		var _p17 = _p16._0;
+	var renderIntermediate = function (_p17) {
+		var _p18 = _p17;
+		var _p19 = _p18._0;
 		return A2(
 			_elm_lang$core$Basics_ops['++'],
-			renderClass(_p17),
+			renderClass(_p19),
 			A2(
 				_elm_lang$core$String$join,
 				'\n',
-				A2(_elm_lang$core$List$map, renderIntermediate, _p17.others)));
+				A2(_elm_lang$core$List$map, renderIntermediate, _p19.others)));
 	};
 	return A2(
 		_elm_lang$core$String$join,
@@ -11911,14 +11997,14 @@ var _mdgriffith$stylish_elephants$Internal_Style$render = function (classes) {
 			A3(
 				_elm_lang$core$List$foldr,
 				F2(
-					function (_p18, existing) {
-						var _p19 = _p18;
+					function (_p20, existing) {
+						var _p21 = _p20;
 						return {
 							ctor: '::',
 							_0: A2(
 								_mdgriffith$stylish_elephants$Internal_Style$renderRules,
-								A2(_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate, _p19._0, ''),
-								_p19._1),
+								A2(_mdgriffith$stylish_elephants$Internal_Style$emptyIntermediate, _p21._0, ''),
+								_p21._1),
 							_1: existing
 						};
 					}),
@@ -12446,8 +12532,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																																								_elm_lang$core$List$map,
 																																																								_mdgriffith$stylish_elephants$Internal_Style$locations,
 																																																								function (loc) {
-																																																									var _p20 = loc;
-																																																									switch (_p20.ctor) {
+																																																									var _p22 = loc;
+																																																									switch (_p22.ctor) {
 																																																										case 'Above':
 																																																											return A2(
 																																																												_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
@@ -13070,19 +13156,19 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																_1: {
 																	ctor: '::',
 																	_0: A2(
-																		_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
+																		_mdgriffith$stylish_elephants$Internal_Style$Child,
 																		'.width-content',
 																		{
 																			ctor: '::',
-																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'width', 'auto'),
+																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'left'),
 																			_1: {ctor: '[]'}
 																		}),
 																	_1: {
 																		ctor: '::',
 																		_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
 																			function (alignment) {
-																				var _p21 = alignment;
-																				switch (_p21.ctor) {
+																				var _p23 = alignment;
+																				switch (_p23.ctor) {
 																					case 'Top':
 																						return {
 																							ctor: '_Tuple2',
@@ -13338,41 +13424,52 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																				ctor: '::',
 																				_0: A2(
 																					_mdgriffith$stylish_elephants$Internal_Style$Child,
-																					'.width-fill',
+																					'.height-fill-between',
 																					{
 																						ctor: '::',
-																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '100000'),
-																						_1: {ctor: '[]'}
+																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch'),
+																						_1: {
+																							ctor: '::',
+																							_0: A2(
+																								_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
+																								'.aligned-vertically',
+																								{
+																									ctor: '::',
+																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'height', '100%'),
+																									_1: {ctor: '[]'}
+																								}),
+																							_1: {ctor: '[]'}
+																						}
 																					}),
 																				_1: {
 																					ctor: '::',
 																					_0: A2(
 																						_mdgriffith$stylish_elephants$Internal_Style$Child,
-																						'.spacer',
+																						'.width-fill',
 																						{
 																							ctor: '::',
-																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-left', '0 !important'),
-																							_1: {
-																								ctor: '::',
-																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'height', 'auto !important'),
-																								_1: {ctor: '[]'}
-																							}
+																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '100000'),
+																							_1: {ctor: '[]'}
 																						}),
 																					_1: {
 																						ctor: '::',
 																						_0: A2(
 																							_mdgriffith$stylish_elephants$Internal_Style$Child,
-																							'.spacer + .se',
+																							'.spacer',
 																							{
 																								ctor: '::',
 																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-left', '0 !important'),
-																								_1: {ctor: '[]'}
+																								_1: {
+																									ctor: '::',
+																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'height', 'auto !important'),
+																									_1: {ctor: '[]'}
+																								}
 																							}),
 																						_1: {
 																							ctor: '::',
 																							_0: A2(
 																								_mdgriffith$stylish_elephants$Internal_Style$Child,
-																								'.stylesheet + .se',
+																								'.spacer + .se',
 																								{
 																									ctor: '::',
 																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-left', '0 !important'),
@@ -13382,7 +13479,7 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																								ctor: '::',
 																								_0: A2(
 																									_mdgriffith$stylish_elephants$Internal_Style$Child,
-																									'.nearby + .se',
+																									'.stylesheet + .se',
 																									{
 																										ctor: '::',
 																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-left', '0 !important'),
@@ -13392,35 +13489,35 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																									ctor: '::',
 																									_0: A2(
 																										_mdgriffith$stylish_elephants$Internal_Style$Child,
-																										'.container',
+																										'.nearby + .se',
 																										{
 																											ctor: '::',
-																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
-																											_1: {
-																												ctor: '::',
-																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-basis', '0%'),
-																												_1: {
-																													ctor: '::',
-																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch'),
-																													_1: {ctor: '[]'}
-																												}
-																											}
+																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-left', '0 !important'),
+																											_1: {ctor: '[]'}
 																										}),
 																									_1: {
 																										ctor: '::',
 																										_0: A2(
 																											_mdgriffith$stylish_elephants$Internal_Style$Child,
-																											'alignLeft:last-of-type.align-container-left',
+																											'.container',
 																											{
 																												ctor: '::',
-																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																												_1: {ctor: '[]'}
+																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																												_1: {
+																													ctor: '::',
+																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-basis', '0%'),
+																													_1: {
+																														ctor: '::',
+																														_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch'),
+																														_1: {ctor: '[]'}
+																													}
+																												}
 																											}),
 																										_1: {
 																											ctor: '::',
 																											_0: A2(
 																												_mdgriffith$stylish_elephants$Internal_Style$Child,
-																												'alignRight:first-of-type.align-container-right',
+																												'alignLeft:last-of-type.align-container-left',
 																												{
 																													ctor: '::',
 																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
@@ -13430,28 +13527,17 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																												ctor: '::',
 																												_0: A2(
 																													_mdgriffith$stylish_elephants$Internal_Style$Child,
-																													'centerX:first-of-type.align-container-center-x',
+																													'alignRight:first-of-type.align-container-right',
 																													{
 																														ctor: '::',
 																														_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																														_1: {
-																															ctor: '::',
-																															_0: A2(
-																																_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																'.self-center-y',
-																																{
-																																	ctor: '::',
-																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', '0 !important'),
-																																	_1: {ctor: '[]'}
-																																}),
-																															_1: {ctor: '[]'}
-																														}
+																														_1: {ctor: '[]'}
 																													}),
 																												_1: {
 																													ctor: '::',
 																													_0: A2(
 																														_mdgriffith$stylish_elephants$Internal_Style$Child,
-																														'centerX:last-of-type.align-container-center-x',
+																														'centerX:first-of-type.align-container-center-x',
 																														{
 																															ctor: '::',
 																															_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
@@ -13462,7 +13548,7 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																	'.self-center-y',
 																																	{
 																																		ctor: '::',
-																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
+																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', '0 !important'),
 																																		_1: {ctor: '[]'}
 																																	}),
 																																_1: {ctor: '[]'}
@@ -13472,7 +13558,7 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																														ctor: '::',
 																														_0: A2(
 																															_mdgriffith$stylish_elephants$Internal_Style$Child,
-																															'centerX:only-of-type.align-container-center-x',
+																															'centerX:last-of-type.align-container-center-x',
 																															{
 																																ctor: '::',
 																																_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
@@ -13483,12 +13569,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																		'.self-center-y',
 																																		{
 																																			ctor: '::',
-																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto !important'),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto !important'),
-																																				_1: {ctor: '[]'}
-																																			}
+																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
+																																			_1: {ctor: '[]'}
 																																		}),
 																																	_1: {ctor: '[]'}
 																																}
@@ -13497,17 +13579,32 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																															ctor: '::',
 																															_0: A2(
 																																_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																'centerX:last-of-type.align-container-center-x ~ alignRight',
+																																'centerX:only-of-type.align-container-center-x',
 																																{
 																																	ctor: '::',
-																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
-																																	_1: {ctor: '[]'}
+																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A2(
+																																			_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																			'.self-center-y',
+																																			{
+																																				ctor: '::',
+																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto !important'),
+																																				_1: {
+																																					ctor: '::',
+																																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto !important'),
+																																					_1: {ctor: '[]'}
+																																				}
+																																			}),
+																																		_1: {ctor: '[]'}
+																																	}
 																																}),
 																															_1: {
 																																ctor: '::',
 																																_0: A2(
 																																	_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																	'alignRight:first-of-type.align-container-right ~ centerX.align-container-center-x',
+																																	'centerX:last-of-type.align-container-center-x ~ alignRight',
 																																	{
 																																		ctor: '::',
 																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
@@ -13515,106 +13612,117 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																	}),
 																																_1: {
 																																	ctor: '::',
-																																	_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
-																																		function (alignment) {
-																																			var _p22 = alignment;
-																																			switch (_p22.ctor) {
-																																				case 'Top':
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-start'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-start'),
-																																							_1: {ctor: '[]'}
-																																						}
-																																					};
-																																				case 'Bottom':
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-end'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-end'),
-																																							_1: {ctor: '[]'}
-																																						}
-																																					};
-																																				case 'Right':
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-end'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {ctor: '[]'}
-																																					};
-																																				case 'Left':
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-start'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {ctor: '[]'}
-																																					};
-																																				case 'CenterX':
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'center'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {ctor: '[]'}
-																																					};
-																																				default:
-																																					return {
-																																						ctor: '_Tuple2',
-																																						_0: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'center'),
-																																							_1: {ctor: '[]'}
-																																						},
-																																						_1: {
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'center'),
-																																							_1: {ctor: '[]'}
-																																						}
-																																					};
-																																			}
+																																	_0: A2(
+																																		_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																		'alignRight:first-of-type.align-container-right ~ centerX.align-container-center-x',
+																																		{
+																																			ctor: '::',
+																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																																			_1: {ctor: '[]'}
 																																		}),
 																																	_1: {
 																																		ctor: '::',
-																																		_0: A2(
-																																			_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
-																																			'.space-evenly',
-																																			{
-																																				ctor: '::',
-																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'space-between'),
-																																				_1: {
-																																					ctor: '::',
-																																					_0: A2(
-																																						_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																						'.spacer',
-																																						{
-																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'display', 'none'),
+																																		_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
+																																			function (alignment) {
+																																				var _p24 = alignment;
+																																				switch (_p24.ctor) {
+																																					case 'Top':
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-start'),
+																																								_1: {ctor: '[]'}
+																																							},
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-start'),
+																																								_1: {ctor: '[]'}
+																																							}
+																																						};
+																																					case 'Bottom':
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-end'),
+																																								_1: {ctor: '[]'}
+																																							},
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-end'),
+																																								_1: {ctor: '[]'}
+																																							}
+																																						};
+																																					case 'Right':
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-end'),
+																																								_1: {ctor: '[]'}
+																																							},
 																																							_1: {ctor: '[]'}
-																																						}),
-																																					_1: {ctor: '[]'}
+																																						};
+																																					case 'Left':
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-start'),
+																																								_1: {ctor: '[]'}
+																																							},
+																																							_1: {ctor: '[]'}
+																																						};
+																																					case 'CenterX':
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'center'),
+																																								_1: {ctor: '[]'}
+																																							},
+																																							_1: {ctor: '[]'}
+																																						};
+																																					default:
+																																						return {
+																																							ctor: '_Tuple2',
+																																							_0: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'center'),
+																																								_1: {ctor: '[]'}
+																																							},
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'center'),
+																																								_1: {ctor: '[]'}
+																																							}
+																																						};
 																																				}
 																																			}),
-																																		_1: {ctor: '[]'}
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A2(
+																																				_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
+																																				'.space-evenly',
+																																				{
+																																					ctor: '::',
+																																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'space-between'),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A2(
+																																							_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																							'.spacer',
+																																							{
+																																								ctor: '::',
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'display', 'none'),
+																																								_1: {ctor: '[]'}
+																																							}),
+																																						_1: {ctor: '[]'}
+																																					}
+																																				}),
+																																			_1: {ctor: '[]'}
+																																		}
 																																	}
 																																}
 																															}
@@ -13682,27 +13790,38 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																			ctor: '::',
 																			_0: A2(
 																				_mdgriffith$stylish_elephants$Internal_Style$Child,
-																				'.se:first-child',
+																				'.width-fill-between',
 																				{
 																					ctor: '::',
-																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
-																					_1: {ctor: '[]'}
+																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch'),
+																					_1: {
+																						ctor: '::',
+																						_0: A2(
+																							_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
+																							'.aligned-horizontally',
+																							{
+																								ctor: '::',
+																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'width', '100%'),
+																								_1: {ctor: '[]'}
+																							}),
+																						_1: {ctor: '[]'}
+																					}
 																				}),
 																			_1: {
 																				ctor: '::',
 																				_0: A2(
 																					_mdgriffith$stylish_elephants$Internal_Style$Child,
-																					'.spacer + .se',
+																					'.width-content',
 																					{
 																						ctor: '::',
-																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
+																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'left'),
 																						_1: {ctor: '[]'}
 																					}),
 																				_1: {
 																					ctor: '::',
 																					_0: A2(
 																						_mdgriffith$stylish_elephants$Internal_Style$Child,
-																						'.se.spacer',
+																						'.se:first-child',
 																						{
 																							ctor: '::',
 																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
@@ -13712,109 +13831,87 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																						ctor: '::',
 																						_0: A2(
 																							_mdgriffith$stylish_elephants$Internal_Style$Child,
-																							'.se.teleporting-spacer',
+																							'.spacer + .se',
 																							{
 																								ctor: '::',
-																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
+																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
 																								_1: {ctor: '[]'}
 																							}),
 																						_1: {
 																							ctor: '::',
 																							_0: A2(
 																								_mdgriffith$stylish_elephants$Internal_Style$Child,
-																								'.stylesheet + .se',
+																								'.se.spacer',
 																								{
 																									ctor: '::',
-																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
+																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
 																									_1: {ctor: '[]'}
 																								}),
 																							_1: {
 																								ctor: '::',
 																								_0: A2(
 																									_mdgriffith$stylish_elephants$Internal_Style$Child,
-																									'.nearby + .se',
+																									'.se.teleporting-spacer',
 																									{
 																										ctor: '::',
-																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
+																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
 																										_1: {ctor: '[]'}
 																									}),
 																								_1: {
 																									ctor: '::',
 																									_0: A2(
 																										_mdgriffith$stylish_elephants$Internal_Style$Child,
-																										'alignTop:last-of-type.align-container-top',
+																										'.stylesheet + .se',
 																										{
 																											ctor: '::',
-																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
 																											_1: {ctor: '[]'}
 																										}),
 																									_1: {
 																										ctor: '::',
 																										_0: A2(
 																											_mdgriffith$stylish_elephants$Internal_Style$Child,
-																											'alignBottom:first-of-type.align-container-bottom',
+																											'.nearby + .se',
 																											{
 																												ctor: '::',
-																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0'),
 																												_1: {ctor: '[]'}
 																											}),
 																										_1: {
 																											ctor: '::',
 																											_0: A2(
 																												_mdgriffith$stylish_elephants$Internal_Style$Child,
-																												'.teleporting-spacer',
+																												'alignTop:last-of-type.align-container-top',
 																												{
 																													ctor: '::',
-																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
 																													_1: {ctor: '[]'}
 																												}),
 																											_1: {
 																												ctor: '::',
 																												_0: A2(
 																													_mdgriffith$stylish_elephants$Internal_Style$Child,
-																													'centerY:first-of-type.align-container-center-y',
+																													'alignBottom:first-of-type.align-container-bottom',
 																													{
 																														ctor: '::',
 																														_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																														_1: {
-																															ctor: '::',
-																															_0: A2(
-																																_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																'.self-center-y',
-																																{
-																																	ctor: '::',
-																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', '0 !important'),
-																																	_1: {ctor: '[]'}
-																																}),
-																															_1: {ctor: '[]'}
-																														}
+																														_1: {ctor: '[]'}
 																													}),
 																												_1: {
 																													ctor: '::',
 																													_0: A2(
 																														_mdgriffith$stylish_elephants$Internal_Style$Child,
-																														'centerY:last-of-type.align-container-center-y',
+																														'.teleporting-spacer',
 																														{
 																															ctor: '::',
-																															_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																															_1: {
-																																ctor: '::',
-																																_0: A2(
-																																	_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																	'.self-center-y',
-																																	{
-																																		ctor: '::',
-																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
-																																		_1: {ctor: '[]'}
-																																	}),
-																																_1: {ctor: '[]'}
-																															}
+																															_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																															_1: {ctor: '[]'}
 																														}),
 																													_1: {
 																														ctor: '::',
 																														_0: A2(
 																															_mdgriffith$stylish_elephants$Internal_Style$Child,
-																															'centerY:only-of-type.align-container-center-y',
+																															'centerY:first-of-type.align-container-center-y',
 																															{
 																																ctor: '::',
 																																_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
@@ -13825,12 +13922,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																		'.self-center-y',
 																																		{
 																																			ctor: '::',
-																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto !important'),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto !important'),
-																																				_1: {ctor: '[]'}
-																																			}
+																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', '0 !important'),
+																																			_1: {ctor: '[]'}
 																																		}),
 																																	_1: {ctor: '[]'}
 																																}
@@ -13839,55 +13932,73 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																															ctor: '::',
 																															_0: A2(
 																																_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																'centerY:last-of-type.align-container-center-y ~ alignBottom',
+																																'centerY:last-of-type.align-container-center-y',
 																																{
 																																	ctor: '::',
-																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
-																																	_1: {ctor: '[]'}
+																																	_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																																	_1: {
+																																		ctor: '::',
+																																		_0: A2(
+																																			_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																			'.self-center-y',
+																																			{
+																																				ctor: '::',
+																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', '0 !important'),
+																																				_1: {ctor: '[]'}
+																																			}),
+																																		_1: {ctor: '[]'}
+																																	}
 																																}),
 																															_1: {
 																																ctor: '::',
 																																_0: A2(
 																																	_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																	'alignBottom:first-of-type.align-container-bottom ~ centerY.align-container-center-y',
+																																	'centerY:only-of-type.align-container-center-y',
 																																	{
 																																		ctor: '::',
-																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
-																																		_1: {ctor: '[]'}
+																																		_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																																		_1: {
+																																			ctor: '::',
+																																			_0: A2(
+																																				_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																				'.self-center-y',
+																																				{
+																																					ctor: '::',
+																																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto !important'),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto !important'),
+																																						_1: {ctor: '[]'}
+																																					}
+																																				}),
+																																			_1: {ctor: '[]'}
+																																		}
 																																	}),
 																																_1: {
 																																	ctor: '::',
 																																	_0: A2(
 																																		_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																		'.se.self-center-y:first-child ~ .teleporting-spacer',
+																																		'centerY:last-of-type.align-container-center-y ~ alignBottom',
 																																		{
 																																			ctor: '::',
-																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'order', '-1'),
-																																				_1: {ctor: '[]'}
-																																			}
+																																			_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																																			_1: {ctor: '[]'}
 																																		}),
 																																	_1: {
 																																		ctor: '::',
 																																		_0: A2(
 																																			_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																			'.se.nearby + .se.self-center-y ~ .teleporting-spacer',
+																																			'alignBottom:first-of-type.align-container-bottom ~ centerY.align-container-center-y',
 																																			{
 																																				ctor: '::',
-																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
-																																				_1: {
-																																					ctor: '::',
-																																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'order', '-1'),
-																																					_1: {ctor: '[]'}
-																																				}
+																																				_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																																				_1: {ctor: '[]'}
 																																			}),
 																																		_1: {
 																																			ctor: '::',
 																																			_0: A2(
 																																				_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																				'.stylesheet + .se.self-center-y ~ .teleporting-spacer',
+																																				'.se.self-center-y:first-child ~ .teleporting-spacer',
 																																				{
 																																					ctor: '::',
 																																					_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
@@ -13899,136 +14010,166 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																																				}),
 																																			_1: {
 																																				ctor: '::',
-																																				_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
-																																					function (alignment) {
-																																						var _p23 = alignment;
-																																						switch (_p23.ctor) {
-																																							case 'Top':
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-start'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								};
-																																							case 'Bottom':
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-end'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								};
-																																							case 'Right':
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-end'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-end'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								};
-																																							case 'Left':
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-start'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-start'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								};
-																																							case 'CenterX':
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'center'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'center'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								};
-																																							default:
-																																								return {
-																																									ctor: '_Tuple2',
-																																									_0: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'center'),
-																																										_1: {ctor: '[]'}
-																																									},
-																																									_1: {ctor: '[]'}
-																																								};
+																																				_0: A2(
+																																					_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																					'.se.nearby + .se.self-center-y ~ .teleporting-spacer',
+																																					{
+																																						ctor: '::',
+																																						_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'order', '-1'),
+																																							_1: {ctor: '[]'}
 																																						}
 																																					}),
 																																				_1: {
 																																					ctor: '::',
 																																					_0: A2(
 																																						_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																						'.container',
+																																						'.stylesheet + .se.self-center-y ~ .teleporting-spacer',
 																																						{
 																																							ctor: '::',
-																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																																							_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '1'),
 																																							_1: {
 																																								ctor: '::',
-																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-basis', 'auto'),
-																																								_1: {
-																																									ctor: '::',
-																																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'width', '100%'),
-																																									_1: {
-																																										ctor: '::',
-																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch !important'),
-																																										_1: {ctor: '[]'}
-																																									}
-																																								}
+																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'order', '-1'),
+																																								_1: {ctor: '[]'}
 																																							}
 																																						}),
 																																					_1: {
 																																						ctor: '::',
-																																						_0: A2(
-																																							_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
-																																							'.space-evenly',
-																																							{
-																																								ctor: '::',
-																																								_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'space-between'),
-																																								_1: {
-																																									ctor: '::',
-																																									_0: A2(
-																																										_mdgriffith$stylish_elephants$Internal_Style$Child,
-																																										'.spacer',
-																																										{
-																																											ctor: '::',
-																																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'display', 'none'),
+																																						_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
+																																							function (alignment) {
+																																								var _p25 = alignment;
+																																								switch (_p25.ctor) {
+																																									case 'Top':
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-start'),
+																																												_1: {ctor: '[]'}
+																																											},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-bottom', 'auto'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										};
+																																									case 'Bottom':
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'flex-end'),
+																																												_1: {ctor: '[]'}
+																																											},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'margin-top', 'auto'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										};
+																																									case 'Right':
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-end'),
+																																												_1: {ctor: '[]'}
+																																											},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-end'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										};
+																																									case 'Left':
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'flex-start'),
+																																												_1: {ctor: '[]'}
+																																											},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'flex-start'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										};
+																																									case 'CenterX':
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-items', 'center'),
+																																												_1: {ctor: '[]'}
+																																											},
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'center'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										};
+																																									default:
+																																										return {
+																																											ctor: '_Tuple2',
+																																											_0: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'center'),
+																																												_1: {ctor: '[]'}
+																																											},
 																																											_1: {ctor: '[]'}
-																																										}),
-																																									_1: {ctor: '[]'}
+																																										};
 																																								}
 																																							}),
-																																						_1: {ctor: '[]'}
+																																						_1: {
+																																							ctor: '::',
+																																							_0: A2(
+																																								_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																								'.container',
+																																								{
+																																									ctor: '::',
+																																									_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-grow', '0'),
+																																									_1: {
+																																										ctor: '::',
+																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'flex-basis', 'auto'),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'width', '100%'),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'align-self', 'stretch !important'),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										}
+																																									}
+																																								}),
+																																							_1: {
+																																								ctor: '::',
+																																								_0: A2(
+																																									_mdgriffith$stylish_elephants$Internal_Style$Descriptor,
+																																									'.space-evenly',
+																																									{
+																																										ctor: '::',
+																																										_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'justify-content', 'space-between'),
+																																										_1: {
+																																											ctor: '::',
+																																											_0: A2(
+																																												_mdgriffith$stylish_elephants$Internal_Style$Child,
+																																												'.spacer',
+																																												{
+																																													ctor: '::',
+																																													_0: A2(_mdgriffith$stylish_elephants$Internal_Style$Prop, 'display', 'none'),
+																																													_1: {ctor: '[]'}
+																																												}),
+																																											_1: {ctor: '[]'}
+																																										}
+																																									}),
+																																								_1: {ctor: '[]'}
+																																							}
+																																						}
 																																					}
 																																				}
 																																			}
@@ -14076,8 +14217,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																	ctor: '::',
 																	_0: _mdgriffith$stylish_elephants$Internal_Style$gridAlignments(
 																		function (alignment) {
-																			var _p24 = alignment;
-																			switch (_p24.ctor) {
+																			var _p26 = alignment;
+																			switch (_p26.ctor) {
 																				case 'Top':
 																					return {
 																						ctor: '::',
@@ -14179,8 +14320,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																				ctor: '::',
 																				_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
 																					function (alignment) {
-																						var _p25 = alignment;
-																						switch (_p25.ctor) {
+																						var _p27 = alignment;
+																						switch (_p27.ctor) {
 																							case 'Top':
 																								return {
 																									ctor: '_Tuple2',
@@ -14359,8 +14500,8 @@ var _mdgriffith$stylish_elephants$Internal_Style$rules = _mdgriffith$stylish_ele
 																								ctor: '::',
 																								_0: _mdgriffith$stylish_elephants$Internal_Style$describeAlignment(
 																									function (alignment) {
-																										var _p26 = alignment;
-																										switch (_p26.ctor) {
+																										var _p28 = alignment;
+																										switch (_p28.ctor) {
 																											case 'Top':
 																												return {
 																													ctor: '_Tuple2',
@@ -15448,22 +15589,22 @@ var _mdgriffith$stylish_elephants$Internal_Model$alignYName = function (align) {
 	var _p40 = align;
 	switch (_p40.ctor) {
 		case 'Top':
-			return 'self-top';
+			return 'aligned-vertically self-top';
 		case 'Bottom':
-			return 'self-bottom';
+			return 'aligned-vertically self-bottom';
 		default:
-			return 'self-center-y';
+			return 'aligned-vertically self-center-y';
 	}
 };
 var _mdgriffith$stylish_elephants$Internal_Model$alignXName = function (align) {
 	var _p41 = align;
 	switch (_p41.ctor) {
 		case 'Left':
-			return 'self-left';
+			return 'aligned-horizontally self-left';
 		case 'Right':
-			return 'self-right';
+			return 'aligned-horizontally self-right';
 		default:
-			return 'self-center-x';
+			return 'aligned-horizontally self-center-x';
 	}
 };
 var _mdgriffith$stylish_elephants$Internal_Model$renderNode = F4(
@@ -17224,7 +17365,7 @@ var _mdgriffith$stylish_elephants$Internal_Model$toStyleSheetString = F2(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
 								toGridLength(
-									_elm_lang$core$Tuple$first(_p133.spacing)),
+									_elm_lang$core$Tuple$second(_p133.spacing)),
 								';'));
 						var xSpacing = toGridLength(
 							_elm_lang$core$Tuple$first(_p133.spacing));
@@ -18246,7 +18387,7 @@ var _mdgriffith$stylish_elephants$Internal_Model$gatherAttributes = F2(
 									ctor: '_Tuple2',
 									_0: A2(
 										_elm_lang$core$Basics_ops['++'],
-										'width-fill-portion width-fill-',
+										'width-fill-between width-fill-',
 										_elm_lang$core$Basics$toString(_p175.portion)),
 									_1: A3(
 										_mdgriffith$stylish_elephants$Internal_Model$Single,
@@ -18266,7 +18407,7 @@ var _mdgriffith$stylish_elephants$Internal_Model$gatherAttributes = F2(
 									ctor: '_Tuple2',
 									_0: A2(
 										_elm_lang$core$Basics_ops['++'],
-										'.max-width-',
+										'max-width-',
 										_mdgriffith$stylish_elephants$Internal_Model$intToString(px)),
 									_1: A3(
 										_mdgriffith$stylish_elephants$Internal_Model$Single,
@@ -18449,7 +18590,7 @@ var _mdgriffith$stylish_elephants$Internal_Model$gatherAttributes = F2(
 									ctor: '_Tuple2',
 									_0: A2(
 										_elm_lang$core$Basics_ops['++'],
-										'height-fill-portion height-fill-',
+										'height-fill-between height-fill-',
 										_elm_lang$core$Basics$toString(_p180.portion)),
 									_1: A3(
 										_mdgriffith$stylish_elephants$Internal_Model$Single,
@@ -19184,12 +19325,8 @@ var _mdgriffith$stylish_elephants$Internal_Model$asElement = F4(
 							return _mdgriffith$stylish_elephants$Internal_Model$Unkeyed(
 								{
 									ctor: '::',
-									_0: _mdgriffith$stylish_elephants$Internal_Style$rulesElement,
-									_1: {
-										ctor: '::',
-										_0: A2(_mdgriffith$stylish_elephants$Internal_Model$toStyleSheet, _p234, styles),
-										_1: _p231._0
-									}
+									_0: A2(_mdgriffith$stylish_elephants$Internal_Model$toStyleSheet, _p234, styles),
+									_1: _p231._0
 								});
 						}
 					} else {
@@ -19352,12 +19489,20 @@ var _mdgriffith$stylish_elephants$Internal_Model$optionsToRecord = function (opt
 var _mdgriffith$stylish_elephants$Internal_Model$renderRoot = F3(
 	function (optionList, attributes, child) {
 		var options = _mdgriffith$stylish_elephants$Internal_Model$optionsToRecord(optionList);
+		var embedStyle = function () {
+			var _p244 = options.mode;
+			if (_p244.ctor === 'NoStaticStyleSheet') {
+				return _mdgriffith$stylish_elephants$Internal_Model$OnlyDynamic(options);
+			} else {
+				return _mdgriffith$stylish_elephants$Internal_Model$StaticRootAndDynamic(options);
+			}
+		}();
 		return A2(
 			_mdgriffith$stylish_elephants$Internal_Model$toHtml,
 			options,
 			A5(
 				_mdgriffith$stylish_elephants$Internal_Model$element,
-				_mdgriffith$stylish_elephants$Internal_Model$StaticRootAndDynamic(options),
+				embedStyle,
 				_mdgriffith$stylish_elephants$Internal_Model$asEl,
 				_elm_lang$core$Maybe$Nothing,
 				attributes,
@@ -21255,7 +21400,7 @@ var _mdgriffith$stylish_elephants$Element_Input$defaultTextBoxStyle = {
 		_0: _mdgriffith$stylish_elephants$Element_Border$rounded(3),
 		_1: {
 			ctor: '::',
-			_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$lightGrey),
+			_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$darkGrey),
 			_1: {
 				ctor: '::',
 				_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$white),
@@ -23171,7 +23316,7 @@ var _mdgriffith$stylish_elephants$Element_Input$select = F2(
 					_0: _mdgriffith$stylish_elephants$Element_Border$width(1),
 					_1: {
 						ctor: '::',
-						_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$lightGrey),
+						_0: _mdgriffith$stylish_elephants$Element_Border$color(_elm_lang$core$Color$darkGrey),
 						_1: {
 							ctor: '::',
 							_0: _mdgriffith$stylish_elephants$Element_Border$rounded(5),
@@ -23276,19 +23421,97 @@ var _mdgriffith$stylish_elephants$Element_Input$radioRow = _mdgriffith$stylish_e
 var _user$project$Main$subscriptions = function (_p0) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Main$suitToInt = function (suit) {
-	var _p1 = suit;
-	switch (_p1.ctor) {
-		case 'Hearts':
-			return 1;
-		case 'Clubs':
-			return 2;
-		case 'Diamonds':
-			return 3;
-		default:
-			return 4;
-	}
+var _user$project$Main$viewHandListEntry = function (_p1) {
+	var _p2 = _p1;
+	return A2(
+		_mdgriffith$stylish_elephants$Element$row,
+		{
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element$padding(5),
+			_1: {
+				ctor: '::',
+				_0: _mdgriffith$stylish_elephants$Element$spacing(30),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_mdgriffith$stylish_elephants$Element$el,
+				{
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$alignLeft,
+					_1: {ctor: '[]'}
+				},
+				_mdgriffith$stylish_elephants$Element$text(_p2._0)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_mdgriffith$stylish_elephants$Element$el,
+					{
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$alignRight,
+						_1: {ctor: '[]'}
+					},
+					_mdgriffith$stylish_elephants$Element$text(_p2._1)),
+				_1: {ctor: '[]'}
+			}
+		});
 };
+var _user$project$Main$viewStack = F2(
+	function (cardView, cards) {
+		var stackAtts = {
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element$width(
+				_mdgriffith$stylish_elephants$Element$px(150)),
+			_1: {
+				ctor: '::',
+				_0: _mdgriffith$stylish_elephants$Element$height(
+					_mdgriffith$stylish_elephants$Element$px(150)),
+				_1: {
+					ctor: '::',
+					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 15, 25),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+		var _p3 = _elm_lang$core$List$head(cards);
+		if (_p3.ctor === 'Nothing') {
+			return A2(_mdgriffith$stylish_elephants$Element$el, stackAtts, _mdgriffith$stylish_elephants$Element$empty);
+		} else {
+			var cardString = _elm_lang$core$String$concat(
+				A2(
+					_elm_lang$core$List$repeat,
+					_elm_lang$core$List$length(cards) - 1,
+					'🂠'));
+			return A2(
+				_mdgriffith$stylish_elephants$Element$el,
+				stackAtts,
+				A2(
+					_mdgriffith$stylish_elephants$Element$column,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: cardView(_p3._0),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_mdgriffith$stylish_elephants$Element$el,
+								{
+									ctor: '::',
+									_0: _mdgriffith$stylish_elephants$Element_Font$color(_elm_lang$core$Color$white),
+									_1: {
+										ctor: '::',
+										_0: _mdgriffith$stylish_elephants$Element$centerX,
+										_1: {ctor: '[]'}
+									}
+								},
+								_mdgriffith$stylish_elephants$Element$text(cardString)),
+							_1: {ctor: '[]'}
+						}
+					}));
+		}
+	});
 var _user$project$Main$viewBonusStar = F2(
 	function (bonusSuit, cardSuit) {
 		return _elm_lang$core$Native_Utils.eq(cardSuit, bonusSuit) ? A2(
@@ -23317,9 +23540,9 @@ var _user$project$Main$viewBonusStar = F2(
 			_mdgriffith$stylish_elephants$Element$text('★')) : _mdgriffith$stylish_elephants$Element$empty;
 	});
 var _user$project$Main$viewSuit = function (suit) {
-	var _p2 = function () {
-		var _p3 = suit;
-		switch (_p3.ctor) {
+	var _p4 = function () {
+		var _p5 = suit;
+		switch (_p5.ctor) {
 			case 'Hearts':
 				return {ctor: '_Tuple2', _0: '♥', _1: _elm_lang$core$Color$red};
 			case 'Clubs':
@@ -23330,8 +23553,8 @@ var _user$project$Main$viewSuit = function (suit) {
 				return {ctor: '_Tuple2', _0: '♠', _1: _elm_lang$core$Color$black};
 		}
 	}();
-	var symbol = _p2._0;
-	var colour = _p2._1;
+	var symbol = _p4._0;
+	var colour = _p4._1;
 	return A2(
 		_mdgriffith$stylish_elephants$Element$el,
 		{
@@ -23363,8 +23586,8 @@ var _user$project$Main$viewSuit = function (suit) {
 };
 var _user$project$Main$viewRank = function (rank) {
 	var rankNum = function () {
-		var _p4 = rank;
-		switch (_p4.ctor) {
+		var _p6 = rank;
+		switch (_p6.ctor) {
 			case 'Two':
 				return '2';
 			case 'Three':
@@ -23415,6 +23638,65 @@ var _user$project$Main$viewRank = function (rank) {
 		},
 		_mdgriffith$stylish_elephants$Element$text(rankNum));
 };
+var _user$project$Main$viewWhiteBarAtts = {
+	ctor: '::',
+	_0: _mdgriffith$stylish_elephants$Element$centerX,
+	_1: {
+		ctor: '::',
+		_0: _mdgriffith$stylish_elephants$Element$width(_mdgriffith$stylish_elephants$Element$fill),
+		_1: {
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$white),
+			_1: {
+				ctor: '::',
+				_0: _mdgriffith$stylish_elephants$Element_Font$center,
+				_1: {
+					ctor: '::',
+					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 0, 10),
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	}
+};
+var _user$project$Main$inRow = F3(
+	function (target, rownum, row) {
+		return A2(
+			_elm_lang$core$List$member,
+			target,
+			_elm_lang$core$List$concat(row)) ? _elm_lang$core$Maybe$Just(rownum) : _elm_lang$core$Maybe$Nothing;
+	});
+var _user$project$Main$inRowAll = F2(
+	function (grid, target) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			_elm_lang$core$Basics$identity,
+			A2(
+				_elm_lang$core$List$indexedMap,
+				_user$project$Main$inRow(target),
+				grid));
+	});
+var _user$project$Main$uniqueRows = F2(
+	function (searches, grid) {
+		return _elm_community$list_extra$List_Extra$unique(
+			A2(
+				_elm_lang$core$List$concatMap,
+				_user$project$Main$inRowAll(grid),
+				searches));
+	});
+var _user$project$Main$suitToInt = function (suit) {
+	var _p7 = suit;
+	switch (_p7.ctor) {
+		case 'Hearts':
+			return 1;
+		case 'Clubs':
+			return 2;
+		case 'Diamonds':
+			return 3;
+		default:
+			return 4;
+	}
+};
 var _user$project$Main$handCounts = F3(
 	function (selection, component, sortfunc) {
 		return A2(
@@ -23461,17 +23743,6 @@ var _user$project$Main$removeCardFromBoard = F2(
 			_user$project$Main$removeCardFromRow(card),
 			board);
 	});
-var _user$project$Main$lastCardInStack = function (cards) {
-	return _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$List$length(cards),
-		1);
-};
-var _user$project$Main$lastCardsInRow = function (row) {
-	return A2(_elm_lang$core$List$map, _user$project$Main$lastCardInStack, row);
-};
-var _user$project$Main$lastCardsInBoard = function (board) {
-	return A2(_elm_lang$core$List$map, _user$project$Main$lastCardsInRow, board);
-};
 var _user$project$Main$bonusScoreFromSelection = F3(
 	function (selected, lastCard, bonus) {
 		var bonuses = _elm_lang$core$List$concat(bonus);
@@ -23488,167 +23759,16 @@ var _user$project$Main$bonusScoreFromSelection = F3(
 				lastCards,
 				bonuses));
 	});
-var _user$project$Main$viewStack = F2(
-	function (cardView, cards) {
-		var stackAtts = {
-			ctor: '::',
-			_0: _mdgriffith$stylish_elephants$Element$width(
-				_mdgriffith$stylish_elephants$Element$px(150)),
-			_1: {
-				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element$height(
-					_mdgriffith$stylish_elephants$Element$px(150)),
-				_1: {
-					ctor: '::',
-					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 15, 25),
-					_1: {ctor: '[]'}
-				}
-			}
-		};
-		var _p5 = _elm_lang$core$List$head(cards);
-		if (_p5.ctor === 'Nothing') {
-			return A2(_mdgriffith$stylish_elephants$Element$el, stackAtts, _mdgriffith$stylish_elephants$Element$empty);
-		} else {
-			var cardString = _elm_lang$core$String$concat(
-				A2(
-					_elm_lang$core$List$repeat,
-					_elm_lang$core$List$length(cards) - 1,
-					'🂠'));
-			return A2(
-				_mdgriffith$stylish_elephants$Element$el,
-				stackAtts,
-				A2(
-					_mdgriffith$stylish_elephants$Element$column,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: cardView(_p5._0),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_mdgriffith$stylish_elephants$Element$el,
-								{
-									ctor: '::',
-									_0: _mdgriffith$stylish_elephants$Element_Font$color(_elm_lang$core$Color$white),
-									_1: {
-										ctor: '::',
-										_0: _mdgriffith$stylish_elephants$Element$centerX,
-										_1: {ctor: '[]'}
-									}
-								},
-								_mdgriffith$stylish_elephants$Element$text(cardString)),
-							_1: {ctor: '[]'}
-						}
-					}));
-		}
-	});
-var _user$project$Main$inRow = F3(
-	function (target, rownum, row) {
-		return A2(
-			_elm_lang$core$List$member,
-			target,
-			_elm_lang$core$List$concat(row)) ? _elm_lang$core$Maybe$Just(rownum) : _elm_lang$core$Maybe$Nothing;
-	});
-var _user$project$Main$inRowAll = F2(
-	function (grid, target) {
-		return A2(
-			_elm_lang$core$List$filterMap,
-			_elm_lang$core$Basics$identity,
-			A2(
-				_elm_lang$core$List$indexedMap,
-				_user$project$Main$inRow(target),
-				grid));
-	});
-var _user$project$Main$uniqueRows = F2(
-	function (searches, grid) {
-		return _elm_community$list_extra$List_Extra$unique(
-			A2(
-				_elm_lang$core$List$concatMap,
-				_user$project$Main$inRowAll(grid),
-				searches));
-	});
-var _user$project$Main$viewWhiteBarAtts = {
-	ctor: '::',
-	_0: _mdgriffith$stylish_elephants$Element$centerX,
-	_1: {
-		ctor: '::',
-		_0: _mdgriffith$stylish_elephants$Element$width(_mdgriffith$stylish_elephants$Element$fill),
-		_1: {
-			ctor: '::',
-			_0: _mdgriffith$stylish_elephants$Element_Background$color(_elm_lang$core$Color$white),
-			_1: {
-				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element_Font$center,
-				_1: {
-					ctor: '::',
-					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 0, 10),
-					_1: {ctor: '[]'}
-				}
-			}
-		}
-	}
+var _user$project$Main$lastCardInStack = function (cards) {
+	return _elm_lang$core$Native_Utils.eq(
+		_elm_lang$core$List$length(cards),
+		1);
 };
-var _user$project$Main$handListEntries = {
-	ctor: '::',
-	_0: {ctor: '_Tuple2', _0: 'Straight Flush', _1: '150pts'},
-	_1: {
-		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'Four Of A Kind', _1: '100pts'},
-		_1: {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'Flush', _1: '90pts'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'Full House', _1: '70pts'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: '5 Card Straight', _1: '50pts'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'Three Of A Kind', _1: '30pts'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: '3 Card Straight', _1: '20pts'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'Pair', _1: '10pts'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+var _user$project$Main$lastCardsInRow = function (row) {
+	return A2(_elm_lang$core$List$map, _user$project$Main$lastCardInStack, row);
 };
-var _user$project$Main$viewHandListEntry = function (_p6) {
-	var _p7 = _p6;
-	return A2(
-		_mdgriffith$stylish_elephants$Element$row,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_mdgriffith$stylish_elephants$Element$el,
-				{
-					ctor: '::',
-					_0: _mdgriffith$stylish_elephants$Element$alignLeft,
-					_1: {ctor: '[]'}
-				},
-				_mdgriffith$stylish_elephants$Element$text(_p7._0)),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_mdgriffith$stylish_elephants$Element$el,
-					{
-						ctor: '::',
-						_0: _mdgriffith$stylish_elephants$Element$alignRight,
-						_1: {ctor: '[]'}
-					},
-					_mdgriffith$stylish_elephants$Element$text(_p7._1)),
-				_1: {ctor: '[]'}
-			}
-		});
+var _user$project$Main$lastCardsInBoard = function (board) {
+	return A2(_elm_lang$core$List$map, _user$project$Main$lastCardsInRow, board);
 };
 var _user$project$Main$clearStackBonuses = _elm_community$list_extra$List_Extra$transpose(
 	A2(
@@ -23674,6 +23794,10 @@ var _user$project$Main$Model = F7(
 var _user$project$Main$Card = F2(
 	function (a, b) {
 		return {rank: a, suit: b};
+	});
+var _user$project$Main$Hand = F3(
+	function (a, b, c) {
+		return {handName: a, handCheck: b, baseScore: c};
 	});
 var _user$project$Main$ScoredHand = F5(
 	function (a, b, c, d, e) {
@@ -23779,48 +23903,6 @@ var _user$project$Main$straightFlush = function (sel) {
 };
 var _user$project$Main$Spades = {ctor: 'Spades'};
 var _user$project$Main$dummyCard = A2(_user$project$Main$Card, _user$project$Main$Ace, _user$project$Main$Spades);
-var _user$project$Main$dummyRow = {
-	ctor: '::',
-	_0: {
-		ctor: '::',
-		_0: _user$project$Main$dummyCard,
-		_1: {ctor: '[]'}
-	},
-	_1: {ctor: '[]'}
-};
-var _user$project$Main$viewBoard = F2(
-	function (stackView, board) {
-		var viewRow = function (y) {
-			return A2(
-				_mdgriffith$stylish_elephants$Element$row,
-				{
-					ctor: '::',
-					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 20, 0),
-					_1: {ctor: '[]'}
-				},
-				A2(
-					_elm_lang$core$List$map,
-					stackView,
-					A2(
-						_elm_lang$core$Maybe$withDefault,
-						_user$project$Main$dummyRow,
-						A2(_elm_community$list_extra$List_Extra$getAt, y, board))));
-		};
-		return A2(
-			_mdgriffith$stylish_elephants$Element$column,
-			{
-				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element$moveUp(15),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$List$map,
-				viewRow,
-				A2(
-					_elm_lang$core$List$range,
-					0,
-					_elm_lang$core$List$length(board) - 1)));
-	});
 var _user$project$Main$boardFromDeck = function (deck) {
 	return A2(
 		_elm_community$list_extra$List_Extra$groupsOf,
@@ -23868,12 +23950,6 @@ var _user$project$Main$boardFromDeck = function (deck) {
 				_elm_lang$core$Maybe$withDefault,
 				A2(_elm_lang$core$List$repeat, 51, _user$project$Main$dummyCard),
 				_elm_community$list_extra$List_Extra$init(deck))));
-};
-var _user$project$Main$bonusFromDeck = function (deck) {
-	return A2(
-		_elm_lang$core$Maybe$withDefault,
-		_user$project$Main$dummyCard,
-		_elm_community$list_extra$List_Extra$last(deck));
 };
 var _user$project$Main$orderedRanks = A2(
 	_elm_lang$core$Maybe$withDefault,
@@ -23948,6 +24024,39 @@ var _user$project$Main$fourOfAKind = function (sel) {
 			_1: {ctor: '[]'}
 		});
 };
+var _user$project$Main$validGameHands = {
+	ctor: '::',
+	_0: A3(_user$project$Main$Hand, 'Straight Flush', _user$project$Main$straightFlush, 150),
+	_1: {
+		ctor: '::',
+		_0: A3(_user$project$Main$Hand, 'Four Of A Kind', _user$project$Main$fourOfAKind, 100),
+		_1: {
+			ctor: '::',
+			_0: A3(_user$project$Main$Hand, 'Flush', _user$project$Main$fiveCardFlush, 90),
+			_1: {
+				ctor: '::',
+				_0: A3(_user$project$Main$Hand, 'Full House', _user$project$Main$fullHouse, 70),
+				_1: {
+					ctor: '::',
+					_0: A3(_user$project$Main$Hand, '5-Card Straight', _user$project$Main$fiveCardStraight, 50),
+					_1: {
+						ctor: '::',
+						_0: A3(_user$project$Main$Hand, 'Three Of A Kind', _user$project$Main$threeOfAKind, 30),
+						_1: {
+							ctor: '::',
+							_0: A3(_user$project$Main$Hand, '3-Card Straight', _user$project$Main$threeCardStraight, 20),
+							_1: {
+								ctor: '::',
+								_0: A3(_user$project$Main$Hand, 'Pair', _user$project$Main$pair, 10),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
 var _user$project$Main$scoreHand = F2(
 	function (cards, bonus) {
 		var isBonus = A2(
@@ -23961,44 +24070,66 @@ var _user$project$Main$scoreHand = F2(
 					return _.suit;
 				},
 				cards));
-		var _p8 = _user$project$Main$pair(cards) ? {ctor: '_Tuple2', _0: 'Pair', _1: 10} : (_user$project$Main$threeCardStraight(cards) ? {ctor: '_Tuple2', _0: '3-card Straight', _1: 20} : (_user$project$Main$threeOfAKind(cards) ? {ctor: '_Tuple2', _0: 'Three of a Kind', _1: 30} : (_user$project$Main$fiveCardStraight(cards) ? {ctor: '_Tuple2', _0: '5-card Straight', _1: 50} : (_user$project$Main$fullHouse(cards) ? {ctor: '_Tuple2', _0: 'Full House', _1: 70} : (_user$project$Main$fiveCardFlush(cards) ? {ctor: '_Tuple2', _0: 'Flush', _1: 90} : (_user$project$Main$fourOfAKind(cards) ? {ctor: '_Tuple2', _0: 'Four of a Kind', _1: 100} : (_user$project$Main$straightFlush(cards) ? {ctor: '_Tuple2', _0: 'Straight Flush', _1: 150} : {ctor: '_Tuple2', _0: 'No hand', _1: 0})))))));
-		var handName = _p8._0;
-		var baseScore = _p8._1;
+		var validHand = A2(
+			_elm_lang$core$Maybe$withDefault,
+			A3(
+				_user$project$Main$Hand,
+				'No hand',
+				function (_p8) {
+					return false;
+				},
+				0),
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$filter,
+					A2(
+						_elm_lang$core$Basics$flip,
+						function (_) {
+							return _.handCheck;
+						},
+						cards),
+					_user$project$Main$validGameHands)));
 		return {
 			hand: cards,
-			handName: handName,
-			baseScore: baseScore,
+			handName: validHand.handName,
+			baseScore: validHand.baseScore,
 			isBonus: isBonus,
-			actualScore: isBonus ? (baseScore * 2) : baseScore
+			actualScore: isBonus ? (validHand.baseScore * 2) : validHand.baseScore
 		};
 	});
 var _user$project$Main$viewPlayingInfoHand = function (model) {
 	var hand = A2(_user$project$Main$scoreHand, model.selected, model.bonus.suit);
 	var bonusText = hand.isBonus ? ' x2' : '';
-	return A2(
-		_mdgriffith$stylish_elephants$Element$el,
-		{ctor: '[]'},
-		_mdgriffith$stylish_elephants$Element$text(
+	return _mdgriffith$stylish_elephants$Element$text(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			hand.handName,
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				hand.handName,
+				' (',
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					' (',
+					_elm_lang$core$Basics$toString(hand.baseScore),
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(hand.baseScore),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							' pts',
-							A2(_elm_lang$core$Basics_ops['++'], bonusText, ')')))))));
+						' pts',
+						A2(_elm_lang$core$Basics_ops['++'], bonusText, ')'))))));
 };
 var _user$project$Main$validHand = function (sel) {
-	return _user$project$Main$pair(sel) || (_user$project$Main$threeCardStraight(sel) || (_user$project$Main$threeOfAKind(sel) || (_user$project$Main$fiveCardStraight(sel) || (_user$project$Main$fullHouse(sel) || (_user$project$Main$fiveCardFlush(sel) || (_user$project$Main$fourOfAKind(sel) || _user$project$Main$straightFlush(sel)))))));
+	return _Chadtech$elm_bool_extra$Bool_Extra$any(
+		A2(
+			_elm_lang$core$List$map,
+			A2(
+				_elm_lang$core$Basics$flip,
+				function (_) {
+					return _.handCheck;
+				},
+				sel),
+			_user$project$Main$validGameHands));
 };
 var _user$project$Main$scoredHandsFromBoard = F2(
 	function (board, bonus) {
-		var validHands = A2(
+		var validBoardHands = A2(
 			_elm_lang$core$List$filter,
 			function (hand) {
 				return _user$project$Main$validHand(hand) && (_elm_lang$core$Native_Utils.cmp(
@@ -24017,7 +24148,7 @@ var _user$project$Main$scoredHandsFromBoard = F2(
 			function (hand) {
 				return A2(_user$project$Main$scoreHand, hand, bonus);
 			},
-			validHands);
+			validBoardHands);
 	});
 var _user$project$Main$noMoreMoves = function (model) {
 	var scoredHands = A2(_user$project$Main$scoredHandsFromBoard, model.board, model.bonus.suit);
@@ -24025,6 +24156,34 @@ var _user$project$Main$noMoreMoves = function (model) {
 		_elm_lang$core$List$length(scoredHands),
 		0) && _elm_lang$core$Native_Utils.eq(model.trashes, 0);
 };
+var _user$project$Main$bonusFromDeck = function (deck) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		_user$project$Main$dummyCard,
+		_elm_community$list_extra$List_Extra$last(deck));
+};
+var _user$project$Main$stackInSelection = F2(
+	function (selection, cards) {
+		var topCard = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_user$project$Main$dummyCard,
+			_elm_lang$core$List$head(cards));
+		return A2(_elm_lang$core$List$member, topCard, selection);
+	});
+var _user$project$Main$rowInSelection = F2(
+	function (selection, row) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Main$stackInSelection(selection),
+			row);
+	});
+var _user$project$Main$boardInSelection = F2(
+	function (selection, board) {
+		return A2(
+			_elm_lang$core$List$map,
+			_user$project$Main$rowInSelection(selection),
+			board);
+	});
 var _user$project$Main$bestHandFromScored = function (hands) {
 	var maxScore = A2(
 		_elm_lang$core$Maybe$withDefault,
@@ -24078,27 +24237,46 @@ var _user$project$Main$bestHandFromScored = function (hands) {
 			0),
 		_elm_lang$core$List$head(longestHighScorers));
 };
-var _user$project$Main$stackInSelection = F2(
-	function (selection, cards) {
-		var topCard = A2(
-			_elm_lang$core$Maybe$withDefault,
-			_user$project$Main$dummyCard,
-			_elm_lang$core$List$head(cards));
-		return A2(_elm_lang$core$List$member, topCard, selection);
-	});
-var _user$project$Main$rowInSelection = F2(
-	function (selection, row) {
+var _user$project$Main$viewBoard = F2(
+	function (stackView, board) {
+		var viewRow = function (y) {
+			return A2(
+				_mdgriffith$stylish_elephants$Element$row,
+				{
+					ctor: '::',
+					_0: A2(_mdgriffith$stylish_elephants$Element$paddingXY, 20, 0),
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_elm_lang$core$List$map,
+					stackView,
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						{
+							ctor: '::',
+							_0: {
+								ctor: '::',
+								_0: _user$project$Main$dummyCard,
+								_1: {ctor: '[]'}
+							},
+							_1: {ctor: '[]'}
+						},
+						A2(_elm_community$list_extra$List_Extra$getAt, y, board))));
+		};
 		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Main$stackInSelection(selection),
-			row);
-	});
-var _user$project$Main$boardInSelection = F2(
-	function (selection, board) {
-		return A2(
-			_elm_lang$core$List$map,
-			_user$project$Main$rowInSelection(selection),
-			board);
+			_mdgriffith$stylish_elephants$Element$column,
+			{
+				ctor: '::',
+				_0: _mdgriffith$stylish_elephants$Element$moveUp(15),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$List$map,
+				viewRow,
+				A2(
+					_elm_lang$core$List$range,
+					0,
+					_elm_lang$core$List$length(board) - 1)));
 	});
 var _user$project$Main$Diamonds = {ctor: 'Diamonds'};
 var _user$project$Main$Clubs = {ctor: 'Clubs'};
@@ -24155,43 +24333,59 @@ var _user$project$Main$initModel = {
 	discarded: {ctor: '[]'},
 	gameState: _user$project$Main$NewGame
 };
+var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Main$ResumePlaying = {ctor: 'ResumePlaying'};
-var _user$project$Main$viewHandList = A2(
-	_mdgriffith$stylish_elephants$Element$column,
-	{ctor: '[]'},
-	{
-		ctor: '::',
-		_0: A2(
-			_mdgriffith$stylish_elephants$Element$el,
-			{
-				ctor: '::',
-				_0: _mdgriffith$stylish_elephants$Element$centerX,
-				_1: {
-					ctor: '::',
-					_0: _mdgriffith$stylish_elephants$Element$centerY,
-					_1: {ctor: '[]'}
-				}
-			},
-			A2(
-				_mdgriffith$stylish_elephants$Element$column,
-				{
-					ctor: '::',
-					_0: _mdgriffith$stylish_elephants$Element$width(_mdgriffith$stylish_elephants$Element$fill),
-					_1: {ctor: '[]'}
-				},
-				A2(_elm_lang$core$List$map, _user$project$Main$viewHandListEntry, _user$project$Main$handListEntries))),
-		_1: {
+var _user$project$Main$viewHandList = function () {
+	var handListEntries = A2(
+		_elm_lang$core$List$map,
+		function (hand) {
+			return {
+				ctor: '_Tuple2',
+				_0: hand.handName,
+				_1: A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(hand.baseScore),
+					' pts')
+			};
+		},
+		_user$project$Main$validGameHands);
+	return A2(
+		_mdgriffith$stylish_elephants$Element$column,
+		{ctor: '[]'},
+		{
 			ctor: '::',
 			_0: A2(
-				_mdgriffith$stylish_elephants$Element_Input$button,
-				_user$project$Main$viewWhiteBarAtts,
+				_mdgriffith$stylish_elephants$Element$el,
 				{
-					onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ResumePlaying),
-					label: _mdgriffith$stylish_elephants$Element$text('Back to game')
-				}),
-			_1: {ctor: '[]'}
-		}
-	});
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerX,
+					_1: {
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$centerY,
+						_1: {ctor: '[]'}
+					}
+				},
+				A2(
+					_mdgriffith$stylish_elephants$Element$column,
+					{
+						ctor: '::',
+						_0: _mdgriffith$stylish_elephants$Element$width(_mdgriffith$stylish_elephants$Element$fill),
+						_1: {ctor: '[]'}
+					},
+					A2(_elm_lang$core$List$map, _user$project$Main$viewHandListEntry, handListEntries))),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_mdgriffith$stylish_elephants$Element_Input$button,
+					_user$project$Main$viewWhiteBarAtts,
+					{
+						onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ResumePlaying),
+						label: _mdgriffith$stylish_elephants$Element$text('Back to game')
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+}();
 var _user$project$Main$ShowHandList = {ctor: 'ShowHandList'};
 var _user$project$Main$viewPlayingInfo = function (model) {
 	var content = (_user$project$Main$validHand(model.selected) && (_elm_lang$core$Native_Utils.cmp(
@@ -24218,7 +24412,11 @@ var _user$project$Main$viewPlayingInfo = function (model) {
 			}
 		}) ? _mdgriffith$stylish_elephants$Element$text('Two Pair isn\'t a hand in Sage :(') : A2(
 		_mdgriffith$stylish_elephants$Element_Input$button,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _mdgriffith$stylish_elephants$Element$centerX,
+			_1: {ctor: '[]'}
+		},
 		{
 			onPress: _elm_lang$core$Maybe$Just(_user$project$Main$ShowHandList),
 			label: _mdgriffith$stylish_elephants$Element$text('Show Hand List')
@@ -24410,11 +24608,6 @@ var _user$project$Main$viewCard = F5(
 	});
 var _user$project$Main$OnShuffle = function (a) {
 	return {ctor: 'OnShuffle', _0: a};
-};
-var _user$project$Main$init = {
-	ctor: '_Tuple2',
-	_0: _user$project$Main$initModel,
-	_1: A2(_elm_lang$core$Random$generate, _user$project$Main$OnShuffle, _user$project$Main$shuffledCardsGenerator)
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
