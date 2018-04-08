@@ -878,7 +878,7 @@ viewPlayingInfo model =
                 Element.text "Two Pair isn't a hand in Sage :("
             else
                 Input.button
-                    []
+                    [ Element.centerX ]
                     { onPress = Just ShowHandList
                     , label = Element.text "Show Hand List"
                     }
@@ -898,14 +898,13 @@ viewPlayingInfoHand model =
             else
                 ""
     in
-        Element.el [] <|
-            Element.text <|
-                hand.handName
-                    ++ " ("
-                    ++ toString hand.baseScore
-                    ++ " pts"
-                    ++ bonusText
-                    ++ ")"
+        Element.text <|
+            hand.handName
+                ++ " ("
+                ++ toString hand.baseScore
+                ++ " pts"
+                ++ bonusText
+                ++ ")"
 
 
 viewPlayingActions : Model -> Element.Element Msg
