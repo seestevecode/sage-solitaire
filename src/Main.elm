@@ -1000,36 +1000,34 @@ viewGameOver model =
 
 viewHandList : Element.Element Msg
 viewHandList =
-    Element.column []
-        [ Element.el [ Element.centerX, Element.centerY ] <|
-            Element.column [ Element.width Element.fill ] <|
-                List.map
-                    viewHandListEntry
-                    handListEntries
-        , Input.button viewWhiteBarAtts
-            { onPress = Just ResumePlaying, label = Element.text "Back to game" }
-        ]
+    let
+        handListEntries =
+            List.map
+                (\hand -> ( hand.handName, toString hand.baseScore ++ " pts" ))
+                validGameHands
+    in
+        Element.column []
+            [ Element.el [ Element.centerX, Element.centerY ] <|
+                Element.column [ Element.width Element.fill ] <|
+                    List.map
+                        viewHandListEntry
+                        handListEntries
+            , Input.button viewWhiteBarAtts
+                { onPress = Just ResumePlaying
+                , label = Element.text "Back to game"
+                }
+            ]
 
 
 viewHandListEntry : ( String, String ) -> Element.Element Msg
 viewHandListEntry ( hand, score ) =
-    Element.row []
+    Element.row
+        [ Element.padding 5
+        , Element.spacing 30
+        ]
         [ Element.el [ Element.alignLeft ] <| Element.text hand
         , Element.el [ Element.alignRight ] <| Element.text score
         ]
-
-
-handListEntries : List ( String, String )
-handListEntries =
-    [ ( "Straight Flush", "150pts" )
-    , ( "Four Of A Kind", "100pts" )
-    , ( "Flush", "90pts" )
-    , ( "Full House", "70pts" )
-    , ( "5 Card Straight", "50pts" )
-    , ( "Three Of A Kind", "30pts" )
-    , ( "3 Card Straight", "20pts" )
-    , ( "Pair", "10pts" )
-    ]
 
 
 
