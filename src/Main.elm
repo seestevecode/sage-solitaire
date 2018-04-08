@@ -12,6 +12,7 @@ import Element.Font as Font
 import Element.Events as Events
 import Element.Border as Border
 import Color
+import Bool.Extra as BoolX
 
 
 main : Program Never Model Msg
@@ -370,39 +371,45 @@ noMoreMoves model =
 scoreHand : List Card -> Suit -> ScoredHand
 scoreHand cards bonus =
     let
-        ( handName, baseScore ) =
-            if pair cards then
-                ( "Pair", 10 )
-            else if threeCardStraight cards then
-                ( "3-card Straight", 20 )
-            else if threeOfAKind cards then
-                ( "Three of a Kind", 30 )
-            else if fiveCardStraight cards then
-                ( "5-card Straight", 50 )
-            else if fullHouse cards then
-                ( "Full House", 70 )
-            else if fiveCardFlush cards then
-                ( "Flush", 90 )
-            else if fourOfAKind cards then
-                ( "Four of a Kind", 100 )
-            else if straightFlush cards then
-                ( "Straight Flush", 150 )
-            else
-                ( "No hand", 0 )
+        validHand =
+            validGameHands
+                |> List.filter (flip .handCheck cards)
+                |> List.head
+                |> Maybe.withDefault (Hand "No hand" (\_ -> False) 0)
 
         isBonus =
             cards |> List.map .suit |> List.any (\suit -> suit == bonus)
     in
         { hand = cards
-        , handName = handName
-        , baseScore = baseScore
+        , handName = validHand.handName
+        , baseScore = validHand.baseScore
         , isBonus = isBonus
         , actualScore =
             if isBonus then
-                baseScore * 2
+                validHand.baseScore * 2
             else
-                baseScore
+                validHand.baseScore
         }
+
+
+validGameHands : List Hand
+validGameHands =
+    [ Hand "Straight Flush" straightFlush 150
+    , Hand "Four Of A Kind" fourOfAKind 100
+    , Hand "Flush" fiveCardFlush 90
+    , Hand "Full House" fullHouse 70
+    , Hand "5-Card Straight" fiveCardStraight 50
+    , Hand "Three Of A Kind" threeOfAKind 30
+    , Hand "3-Card Straight" threeCardStraight 20
+    , Hand "Pair" pair 10
+    ]
+
+
+type alias Hand =
+    { handName : String
+    , handCheck : List Card -> Bool
+    , baseScore : Int
+    }
 
 
 type alias ScoredHand =
@@ -505,7 +512,7 @@ suitToInt suit =
 scoredHandsFromBoard : Board -> Suit -> List ScoredHand
 scoredHandsFromBoard board bonus =
     let
-        validHands =
+        validBoardHands =
             board
                 |> List.concat
                 |> List.map List.head
@@ -517,19 +524,14 @@ scoredHandsFromBoard board bonus =
                             && (List.length (uniqueRows hand board) > 1)
                     )
     in
-        validHands |> List.map (\hand -> scoreHand hand bonus)
+        validBoardHands |> List.map (\hand -> scoreHand hand bonus)
 
 
 validHand : List Card -> Bool
 validHand sel =
-    pair sel
-        || threeCardStraight sel
-        || threeOfAKind sel
-        || fiveCardStraight sel
-        || fullHouse sel
-        || fiveCardFlush sel
-        || fourOfAKind sel
-        || straightFlush sel
+    validGameHands
+        |> List.map (flip .handCheck sel)
+        |> BoolX.any
 
 
 uniqueRows : List Card -> Board -> List Int
