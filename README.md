@@ -22,11 +22,11 @@ You have 2 Trashes initially. Making hands restores Trashes, up to this initial 
 
 ## Road Map
 
-- [ ] Add an undo function - at a cost(?)
-- [ ] Charge for hints, on a sliding (logarithmic?) scale
-- [ ] Make layout responsive for mobile, etc.
-- [ ] Add keyboard controls
-- [ ] Add in-game tutorial
-- [ ] Allow generation of game seed and manual input
-- [ ] Add server-side high score table
-- [ ] Improve best hand selection
+- Add an undo function - at a cost(?)
+- Charge for hints, on a sliding (logarithmic?) scale
+- Make layout responsive for mobile, etc.
+- Add keyboard controls
+- Add in-game tutorial
+- Allow generation of game seed and manual input
+- Add server-side high score table
+- Improve best hand selection
