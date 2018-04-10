@@ -20,9 +20,12 @@ Can't or don't want to make a hand? **Trash a card** instead! To trash a card, s
 
 You have 2 Trashes initially. Making hands restores Trashes, up to this initial value.
 
+## Recent Changes
+
+- You are now charged for some hints, based on the number of hints already taken and your current score.
+
 ## Road Map
 
-- Charge for hints, on a sliding (logarithmic?) scale
 - Make Hint suggest Trash when no valid hands are available
 - Add in-game tutorial
 - Make layout responsive for mobile, etc.

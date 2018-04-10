@@ -23725,6 +23725,17 @@ var _user$project$Main$fiveCardFlush = function (sel) {
 			_user$project$Main$suitCounts(sel)),
 		1);
 };
+var _user$project$Main$hintCost = F2(
+	function (score, hints) {
+		return A3(
+			_elm_lang$core$Basics$clamp,
+			0,
+			A2(
+				_elm_lang$core$Basics$min,
+				score,
+				Math.pow(2, hints) * 10),
+			150);
+	});
 var _user$project$Main$removeCardFromStack = F2(
 	function (card, stack) {
 		return A2(_elm_community$list_extra$List_Extra$remove, card, stack);
@@ -23787,9 +23798,9 @@ var _user$project$Main$clearStackBonuses = _elm_community$list_extra$List_Extra$
 				}
 			}
 		}));
-var _user$project$Main$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {board: a, bonus: b, score: c, trashes: d, selected: e, discarded: f, gameState: g};
+var _user$project$Main$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {board: a, bonus: b, score: c, trashes: d, selected: e, discarded: f, gameState: g, hintsUsed: h, hintAvailable: i};
 	});
 var _user$project$Main$Card = F2(
 	function (a, b) {
@@ -24331,7 +24342,9 @@ var _user$project$Main$initModel = {
 	trashes: 2,
 	selected: {ctor: '[]'},
 	discarded: {ctor: '[]'},
-	gameState: _user$project$Main$NewGame
+	gameState: _user$project$Main$NewGame,
+	hintsUsed: 0,
+	hintAvailable: true
 };
 var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initModel, _1: _elm_lang$core$Platform_Cmd$none};
 var _user$project$Main$ResumePlaying = {ctor: 'ResumePlaying'};
@@ -24464,6 +24477,53 @@ var _user$project$Main$viewGameOver = function (model) {
 		});
 };
 var _user$project$Main$Hint = {ctor: 'Hint'};
+var _user$project$Main$viewPlayingSidebarHint = function (model) {
+	var costString = function () {
+		var _p10 = A2(_user$project$Main$hintCost, model.score, model.hintsUsed);
+		if (_p10 === 0) {
+			return 'Free';
+		} else {
+			return _elm_lang$core$Basics$toString(
+				_elm_lang$core$Basics$negate(
+					A2(_user$project$Main$hintCost, model.score, model.hintsUsed)));
+		}
+	}();
+	var hintAbove = {
+		ctor: '::',
+		_0: _mdgriffith$stylish_elephants$Element$above(
+			A2(
+				_mdgriffith$stylish_elephants$Element$el,
+				{
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerX,
+					_1: {ctor: '[]'}
+				},
+				_mdgriffith$stylish_elephants$Element$text('Hint'))),
+		_1: {ctor: '[]'}
+	};
+	var _p11 = model.hintAvailable;
+	if (_p11 === true) {
+		return A2(
+			_mdgriffith$stylish_elephants$Element_Input$button,
+			A2(_elm_lang$core$Basics_ops['++'], _user$project$Main$viewWhiteBarAtts, hintAbove),
+			{
+				onPress: _elm_lang$core$Maybe$Just(_user$project$Main$Hint),
+				label: _mdgriffith$stylish_elephants$Element$text(costString)
+			});
+	} else {
+		return A2(
+			_mdgriffith$stylish_elephants$Element$el,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _mdgriffith$stylish_elephants$Element$centerX,
+					_1: {ctor: '[]'}
+				},
+				hintAbove),
+			_mdgriffith$stylish_elephants$Element$text('N/A'));
+	}
+};
 var _user$project$Main$Clear = {ctor: 'Clear'};
 var _user$project$Main$SubmitHand = function (a) {
 	return {ctor: 'SubmitHand', _0: a};
@@ -24513,8 +24573,8 @@ var _user$project$Main$viewCard = F5(
 				A2(_user$project$Main$uniqueRows, selected, board)),
 			1) > 0)) ? _elm_lang$core$Color$yellow : _elm_lang$core$Color$red;
 		var locationAtts = function () {
-			var _p10 = location;
-			if (_p10.ctor === 'Board') {
+			var _p12 = location;
+			if (_p12.ctor === 'Board') {
 				return {
 					ctor: '::',
 					_0: _mdgriffith$stylish_elephants$Element_Events$onClick(
@@ -24614,63 +24674,65 @@ var _user$project$Main$update = F2(
 		var lastCards = _user$project$Main$lastCardsInBoard(model.board);
 		var selectedStacks = A2(_user$project$Main$boardInSelection, model.selected, model.board);
 		var clearBonus = A3(_user$project$Main$bonusScoreFromSelection, selectedStacks, lastCards, _user$project$Main$clearStackBonuses);
-		var _p11 = msg;
-		switch (_p11.ctor) {
+		var _p13 = msg;
+		switch (_p13.ctor) {
 			case 'OnShuffle':
-				var _p12 = _p11._0;
+				var _p14 = _p13._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							board: _user$project$Main$boardFromDeck(_p12),
-							bonus: _user$project$Main$bonusFromDeck(_p12)
+							board: _user$project$Main$boardFromDeck(_p14),
+							bonus: _user$project$Main$bonusFromDeck(_p14)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ToggleCard':
-				var _p13 = _p11._0;
+				var _p15 = _p13._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							selected: A2(_elm_lang$core$List$member, _p13, model.selected) ? A2(_elm_community$list_extra$List_Extra$remove, _p13, model.selected) : {ctor: '::', _0: _p13, _1: model.selected}
+							selected: A2(_elm_lang$core$List$member, _p15, model.selected) ? A2(_elm_community$list_extra$List_Extra$remove, _p15, model.selected) : {ctor: '::', _0: _p15, _1: model.selected}
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Trash':
-				var _p14 = _p11._0;
+				var _p16 = _p13._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _user$project$Main$updateGameState(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								board: A2(_user$project$Main$removeCardFromBoard, _p14, model.board),
+								board: A2(_user$project$Main$removeCardFromBoard, _p16, model.board),
 								selected: {ctor: '[]'},
 								trashes: model.trashes - 1,
-								discarded: {ctor: '::', _0: _p14, _1: model.discarded},
-								score: model.score + clearBonus
+								discarded: {ctor: '::', _0: _p16, _1: model.discarded},
+								score: model.score + clearBonus,
+								hintAvailable: true
 							})),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'SubmitHand':
-				var _p15 = _p11._0;
+				var _p17 = _p13._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _user$project$Main$updateGameState(
 						_elm_lang$core$Native_Utils.update(
 							model,
 							{
-								board: A3(_elm_lang$core$List$foldl, _user$project$Main$removeCardFromBoard, model.board, _p15),
+								board: A3(_elm_lang$core$List$foldl, _user$project$Main$removeCardFromBoard, model.board, _p17),
 								trashes: A2(_elm_lang$core$Basics$min, _user$project$Main$initModel.trashes, model.trashes + 1),
 								selected: {ctor: '[]'},
 								score: function () {
 									var hand = A2(_user$project$Main$scoreHand, model.selected, model.bonus.suit);
 									return hand.isBonus ? ((model.score + (hand.baseScore * 2)) + clearBonus) : ((model.score + hand.baseScore) + clearBonus);
 								}(),
-								discarded: A2(_elm_lang$core$Basics_ops['++'], _p15, model.discarded)
+								discarded: A2(_elm_lang$core$Basics_ops['++'], _p17, model.discarded),
+								hintAvailable: true
 							})),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -24698,7 +24760,10 @@ var _user$project$Main$update = F2(
 									return _.hand;
 								}(
 									_user$project$Main$bestHandFromScored(scoredHands)) : {ctor: '[]'};
-							}()
+							}(),
+							score: model.score - A2(_user$project$Main$hintCost, model.score, model.hintsUsed),
+							hintsUsed: model.hintsUsed + 1,
+							hintAvailable: false
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -24759,13 +24824,7 @@ var _user$project$Main$viewPlayingSidebar = function (model) {
 						_elm_lang$core$Basics$toString(model.score)))),
 			_1: {
 				ctor: '::',
-				_0: A2(
-					_mdgriffith$stylish_elephants$Element_Input$button,
-					_user$project$Main$viewWhiteBarAtts,
-					{
-						onPress: _elm_lang$core$Maybe$Just(_user$project$Main$Hint),
-						label: _mdgriffith$stylish_elephants$Element$text('Hint')
-					}),
+				_0: _user$project$Main$viewPlayingSidebarHint(model),
 				_1: {
 					ctor: '::',
 					_0: A5(_user$project$Main$viewCard, _user$project$Main$Sidebar, model.selected, model.board, model.bonus.suit, model.bonus),
@@ -24850,8 +24909,8 @@ var _user$project$Main$viewPlaying = function (model) {
 };
 var _user$project$Main$view = function (model) {
 	var layout = function () {
-		var _p16 = model.gameState;
-		switch (_p16.ctor) {
+		var _p18 = model.gameState;
+		switch (_p18.ctor) {
 			case 'NewGame':
 				return _user$project$Main$viewNewGameButton;
 			case 'Playing':
