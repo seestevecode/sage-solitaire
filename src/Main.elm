@@ -43,6 +43,7 @@ type alias Model =
     , discarded : List Card
     , gameState : GameState
     , hintsUsed : Int
+    , hintAvailable : Bool
     }
 
 
@@ -108,6 +109,7 @@ initModel =
     , discarded = []
     , gameState = NewGame
     , hintsUsed = 0
+    , hintAvailable = True
     }
 
 
@@ -208,6 +210,7 @@ update msg model =
                     , trashes = model.trashes - 1
                     , discarded = card :: model.discarded
                     , score = model.score + clearBonus
+                    , hintAvailable = True
                   }
                     |> updateGameState
                 , Cmd.none
@@ -228,6 +231,7 @@ update msg model =
                             else
                                 model.score + hand.baseScore + clearBonus
                     , discarded = cards ++ model.discarded
+                    , hintAvailable = True
                   }
                     |> updateGameState
                 , Cmd.none
@@ -249,6 +253,8 @@ update msg model =
                                 []
                     , score =
                         model.score - hintCost model.score model.hintsUsed
+                    , hintsUsed = model.hintsUsed + 1
+                    , hintAvailable = False
                   }
                 , Cmd.none
                 )
@@ -978,17 +984,7 @@ viewPlayingSidebar model =
             Element.text <|
                 "Score: "
                     ++ toString model.score
-        , Input.button
-            (viewWhiteBarAtts
-                ++ [ Element.above <|
-                        Element.el [ Element.centerX ] (Element.text "Hint")
-                   ]
-            )
-            { onPress = Just Hint
-            , label =
-                Element.text <|
-                    toString (hintCost model.score model.hintsUsed)
-            }
+        , viewPlayingSidebarHint model
         , viewCard Sidebar model.selected model.board model.bonus.suit model.bonus
         , Element.el [ Element.centerX ] <|
             Element.text <|
@@ -1000,6 +996,31 @@ viewPlayingSidebar model =
             )
             { onPress = Just Clear, label = Element.text "Clear" }
         ]
+
+
+viewPlayingSidebarHint : Model -> Element.Element Msg
+viewPlayingSidebarHint model =
+    case model.hintAvailable of
+        True ->
+            Input.button
+                (viewWhiteBarAtts
+                    ++ [ Element.above <|
+                            Element.el [ Element.centerX ] (Element.text "Hint")
+                       ]
+                )
+                { onPress = Just Hint
+                , label =
+                    Element.text <|
+                        toString (hintCost model.score model.hintsUsed)
+                }
+
+        False ->
+            Element.el
+                [ Element.centerX
+                , Element.above <|
+                    Element.el [ Element.centerX ] (Element.text "Hint")
+                ]
+                (Element.text "N/A")
 
 
 viewGameOver : Model -> Element.Element Msg
