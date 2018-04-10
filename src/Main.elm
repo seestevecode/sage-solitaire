@@ -1005,16 +1005,22 @@ viewPlayingSidebarHint model =
             [ Element.above <|
                 Element.el [ Element.centerX ] (Element.text "Hint")
             ]
+
+        costString =
+            case hintCost model.score model.hintsUsed of
+                0 ->
+                    "Free"
+
+                _ ->
+                    hintCost model.score model.hintsUsed
+                        |> negate
+                        |> toString
     in
         case model.hintAvailable of
             True ->
                 Input.button (viewWhiteBarAtts ++ hintAbove)
                     { onPress = Just Hint
-                    , label =
-                        hintCost model.score model.hintsUsed
-                            |> negate
-                            |> toString
-                            |> Element.text
+                    , label = Element.text costString
                     }
 
             False ->
