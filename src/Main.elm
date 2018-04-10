@@ -1000,27 +1000,27 @@ viewPlayingSidebar model =
 
 viewPlayingSidebarHint : Model -> Element.Element Msg
 viewPlayingSidebarHint model =
-    case model.hintAvailable of
-        True ->
-            Input.button
-                (viewWhiteBarAtts
-                    ++ [ Element.above <|
-                            Element.el [ Element.centerX ] (Element.text "Hint")
-                       ]
-                )
-                { onPress = Just Hint
-                , label =
-                    Element.text <|
-                        toString (hintCost model.score model.hintsUsed)
-                }
+    let
+        hintAbove =
+            [ Element.above <|
+                Element.el [ Element.centerX ] (Element.text "Hint")
+            ]
+    in
+        case model.hintAvailable of
+            True ->
+                Input.button (viewWhiteBarAtts ++ hintAbove)
+                    { onPress = Just Hint
+                    , label =
+                        hintCost model.score model.hintsUsed
+                            |> negate
+                            |> toString
+                            |> Element.text
+                    }
 
-        False ->
-            Element.el
-                [ Element.centerX
-                , Element.above <|
-                    Element.el [ Element.centerX ] (Element.text "Hint")
-                ]
-                (Element.text "N/A")
+            False ->
+                Element.el
+                    ([ Element.centerX ] ++ hintAbove)
+                    (Element.text "N/A")
 
 
 viewGameOver : Model -> Element.Element Msg
