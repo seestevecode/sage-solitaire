@@ -42,6 +42,7 @@ type alias Model =
     , selected : List Card
     , discarded : List Card
     , gameState : GameState
+    , hintsUsed : Int
     }
 
 
@@ -106,6 +107,7 @@ initModel =
     , selected = []
     , discarded = []
     , gameState = NewGame
+    , hintsUsed = 0
     }
 
 
@@ -245,6 +247,8 @@ update msg model =
                                 scoredHands |> bestHandFromScored |> .hand
                             else
                                 []
+                    , score =
+                        model.score - hintCost model.score model.hintsUsed
                   }
                 , Cmd.none
                 )
@@ -390,6 +394,11 @@ scoreHand cards bonus =
             else
                 validHand.baseScore
         }
+
+
+hintCost : Int -> Int -> Int
+hintCost score hints =
+    clamp 0 (min score (2 ^ hints * 10)) 150
 
 
 validGameHands : List Hand
