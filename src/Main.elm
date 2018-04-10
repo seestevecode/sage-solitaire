@@ -978,9 +978,16 @@ viewPlayingSidebar model =
             Element.text <|
                 "Score: "
                     ++ toString model.score
-        , Input.button viewWhiteBarAtts
+        , Input.button
+            (viewWhiteBarAtts
+                ++ [ Element.above <|
+                        Element.el [ Element.centerX ] (Element.text "Hint")
+                   ]
+            )
             { onPress = Just Hint
-            , label = Element.text "Hint"
+            , label =
+                Element.text <|
+                    toString (hintCost model.score model.hintsUsed)
             }
         , viewCard Sidebar model.selected model.board model.bonus.suit model.bonus
         , Element.el [ Element.centerX ] <|
