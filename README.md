@@ -1,4 +1,4 @@
-# Elm Sage Solitaire
+# Sage Solitaire
 
 Based on Sage Solitaire, by Zach Gage
 
