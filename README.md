@@ -2,7 +2,7 @@
 
 Based on Sage Solitaire, by Zach Gage
 
-[Play the game](https://seestevecode.github.io/elm-sage-solitaire/elm-sage-solitaire.html)
+[Play the game](https://seestevecode.github.io/sage-solitaire/elm-sage-solitaire.html)
 
 ## Rules
 
